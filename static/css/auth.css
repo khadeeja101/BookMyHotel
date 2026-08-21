@@ -1,0 +1,88 @@
+/* Center Form Container (Login, Register, verification) */
+.auth_panel {
+    max-width: 480px;
+    margin: 4rem auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2.5rem;
+    box-shadow: var(--shadow);
+    text-align: center;
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+.auth_panel h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+}
+
+.auth_panel p {
+    color: var(--text_secondary);
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+}
+
+.auth_footer {
+    margin-top: 1.5rem;
+    font-size: 0.875rem;
+    color: var(--text_muted);
+}
+
+.auth_footer a {
+    color: var(--teal_bright);
+    font-weight: 500;
+}
+
+.auth_footer a:hover {
+    color: var(--mint);
+    text-decoration: underline;
+}
+
+/* Form Styling Elements */
+.form_group {
+    margin-bottom: 1.25rem;
+}
+
+.form_label {
+    display: block;
+    font-size: 0.825rem;
+    font-weight: 600;
+    color: var(--text_secondary);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-align: left;
+}
+
+.form_control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: var(--surface_2);
+    color: var(--text_primary);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius_sm);
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    transition: all var(--transition);
+    outline: none;
+}
+
+.form_control:focus {
+    border-color: var(--teal_bright);
+    box-shadow: 0 0 0 3px rgba(101, 220, 213, 0.12);
+    background: var(--surface_3);
+}
+
+.form_control::placeholder {
+    color: var(--text_muted);
+}
+
+.form_control option {
+    background: var(--surface_2);
+}
+
+select.form_control {
+    cursor: pointer;
+}

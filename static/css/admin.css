@@ -1,0 +1,178 @@
+/* Admin Performance Metrics Cards */
+.metrics_row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.metric_card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 1.8rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    text-align: center;
+    transition: all var(--transition);
+}
+
+.metric_card:hover {
+    border-color: var(--border_strong);
+    box-shadow: var(--shadow_teal);
+}
+
+.metric_card h3 {
+    font-size: 0.8rem;
+    color: var(--text_secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.8rem;
+}
+
+.metric_value {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--teal_bright);
+    line-height: 1.2;
+}
+
+/* Admin Multi-Tab Navigation */
+.admin_tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+}
+
+.admin_tab_btn {
+    background: none;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text_muted);
+    border-bottom: 3px solid transparent;
+    transition: all var(--transition);
+    cursor: pointer;
+}
+
+.admin_tab_btn:hover {
+    color: var(--white);
+}
+
+.admin_tab_btn.active {
+    color: var(--teal_bright);
+    border-bottom-color: var(--teal_bright);
+}
+
+.admin_panel {
+    display: none;
+    animation: fadeInUp 0.4s ease forwards;
+}
+
+.admin_panel.active {
+    display: block;
+}
+
+/* Split panel for Admin hotel/room management */
+.admin_management_split {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 2.5rem;
+}
+
+@media (max-width: 900px) {
+    .admin_management_split {
+        grid-template-columns: 1fr;
+    }
+}
+
+.management_form_container {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 1.8rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    align-self: start;
+}
+
+/* General Layout Tables (Bookings history and Reports) */
+.table_container {
+    background: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    margin-top: 1.5rem;
+}
+
+.custom_table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.custom_table th {
+    background: var(--surface_2);
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    color: var(--text_secondary);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.custom_table td {
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text_primary);
+}
+
+.custom_table tr:last-child td {
+    border-bottom: none;
+}
+
+.custom_table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* Booking Status Tag Badges */
+.status_tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.status_confirmed {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.status_cancelled {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.status_paid {
+    background: rgba(101, 220, 213, 0.15);
+    color: var(--teal_bright);
+    border: 1px solid rgba(101, 220, 213, 0.25);
+}
+
+.status_refunded {
+    background: rgba(78, 31, 110, 0.5);
+    color: var(--mint);
+    border: 1px solid var(--border);
+}

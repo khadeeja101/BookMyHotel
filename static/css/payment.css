@@ -1,0 +1,114 @@
+/* Checkout and Payment Panel Layout */
+.checkout_panel {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 2.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+
+.checkout_grid {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 2.5rem;
+}
+
+@media (max-width: 850px) {
+    .checkout_grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.checkout_section_title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.2rem;
+    color: var(--white);
+}
+
+/* Payment selection tabs */
+.payment_tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.payment_tab {
+    flex: 1;
+    padding: 0.8rem;
+    border: 1.5px solid var(--border);
+    background: var(--surface_2);
+    border-radius: var(--radius_sm);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all var(--transition);
+    text-align: center;
+    cursor: pointer;
+    color: var(--text_secondary);
+}
+
+.payment_tab:hover {
+    background: var(--surface_3);
+    border-color: var(--border_strong);
+}
+
+.payment_tab.active {
+    border-color: var(--teal_bright);
+    background: rgba(101, 220, 213, 0.1);
+    color: var(--mint_light);
+}
+
+.payment_details_panel {
+    display: none;
+    animation: fadeInUp 0.4s ease forwards;
+}
+
+.payment_details_panel.active {
+    display: block;
+}
+
+/* Add-on service custom cards */
+.checkout_panel .checkbox_label {
+    transition: all var(--transition);
+}
+
+.checkout_panel .checkbox_label:hover {
+    background: var(--surface_3) !important;
+    border-color: var(--teal_bright) !important;
+}
+
+/* Transparent policies block */
+.policy_card {
+    background: rgba(101, 220, 213, 0.05);
+    border-left: 4px solid var(--teal);
+    padding: 1.2rem;
+    border-radius: 0 var(--radius_sm) var(--radius_sm) 0;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.policy_card h4 {
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+    color: var(--teal_bright);
+}
+
+.policy_card p {
+    color: var(--text_secondary);
+}
+
+/* Dynamic Coupon Message Prompts */
+.promo_msg_success {
+    color: var(--success);
+    margin-top: 0.5rem;
+    font-weight: 500;
+}
+
+.promo_msg_error {
+    color: var(--danger);
+    margin-top: 0.5rem;
+    font-weight: 500;
+}

@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Our Team - BookMyHotel.com{% endblock %}
+
+{% block content %}
+<div class="contact_layout_container">
+    
+    <!-- Contact Page Header -->
+    <div class="contact_header">
+        <span class="label_capsule">We're Here to Help</span>
+        <h1>Contact Our Team</h1>
+        <p>Questions about a booking, general enquiries, or feedback — our support team responds within 24 hours.</p>
+    </div>
+
+    <!-- Contact Columns Split Grid -->
+    <div class="contact_grid">
+        
+        <!-- Left: Inquiry Form Card -->
+        <div class="contact_form_card">
+            <h3>Send Us a Message</h3>
+            
+            <form action="{{ url_for('main.contact') }}" method="POST" class="contact_form">
+                
+                <!-- Name and Email input row -->
+                <div class="contact_form_row">
+                    <div class="form_group">
+                        <label for="name" class="form_label">Your Name</label>
+                        <input type="text" name="name" id="name" class="form_control" placeholder="James Tanner" required>
+                    </div>
+                    
+                    <div class="form_group">
+                        <label for="email" class="form_label">Email Address</label>
+                        <input type="email" name="email" id="email" class="form_control" placeholder="you@example.com" required>
+                    </div>
+                </div>
+                
+                <!-- Category Select Dropdown -->
+                <div class="form_group">
+                    <label for="category" class="form_label">Category</label>
+                    <select name="category" id="category" class="form_control">
+                        <option value="General Enquiry">General Enquiry</option>
+                        <option value="Booking Issue">Booking Issue</option>
+                        <option value="Refund Request">Refund Request</option>
+                        <option value="Corporate Partnership">Corporate Partnership</option>
+                    </select>
+                </div>
+                
+                <!-- Subject Input -->
+                <div class="form_group">
+                    <label for="subject" class="form_label">Subject</label>
+                    <input type="text" name="subject" id="subject" class="form_control" placeholder="Brief description of your enquiry" required>
+                </div>
+                
+                <!-- Message Input -->
+                <div class="form_group">
+                    <label for="message" class="form_label">Message</label>
+                    <textarea name="message" id="message" class="form_control" rows="5" placeholder="Please describe your enquiry in as much detail as possible..." required></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn_primary btn_full" style="margin-top: 1.2rem;">
+                    Submit Inquiry
+                </button>
+            </form>
+        </div>
+        
+        <!-- Right: Support Channels List -->
+        <div class="support_channels_column">
+            <!-- Channel Card 1: Email -->
+            <div class="support_channel_card">
+                <div class="channel_icon"></div>
+                <div class="channel_details">
+                    <h4>Email Support</h4>
+                    <span class="channel_value">khad370@gmail.com</span>
+                    <p>Response within 24 hours</p>
+                </div>
+            </div>
+
+            <!-- Channel Card 2: Phone -->
+            <div class="support_channel_card">
+                <div class="channel_icon"></div>
+                <div class="channel_details">
+                    <h4>Phone Support</h4>
+                    <span class="channel_value">+971501234567</span>
+                    <p>Mon-Fri · 9am-6pm UAE Time</p>
+                </div>
+            </div>
+
+            <!-- Channel Card 3: Chat -->
+            <div class="support_channel_card">
+                <div class="channel_icon"></div>
+                <div class="channel_details">
+                    <h4>Live Chat</h4>
+                    <span class="channel_value" style="color: var(--teal-bright);">Chat with us in real time</span>
+                    <p>Available during business hours</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

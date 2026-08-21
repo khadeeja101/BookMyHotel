@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="BookMyHotel.com - Premium Centralized Accommodation Booking Platform in Europe & Asia.">
+    <title>{% block title %}BookMyHotel.com - Secure Online Hotel Bookings{% endblock %}</title>
+    <!-- Main styling stylesheet links -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Header Navigation Bar -->
+    <header>
+        <div class="nav_bar">
+            <a href="{{ url_for('main.index') }}" class="nav_bar_brand">
+                <img src="{{ url_for('static', filename='img/BookMyHotel logo.png') }}" class="navbar_logo_img" alt="BookMyHotel Logo">
+                <span>BookMyHotel</span>
+            </a>
+            
+            <ul class="nav_links">
+                <li><a href="{{ url_for('main.index') }}" class="nav_item {% if request.endpoint == 'main.index' %}active{% endif %}">Home</a></li>
+                <li><a href="{{ url_for('main.browse_hotels') }}" class="nav_item {% if request.endpoint == 'main.browse_hotels' or request.endpoint == 'main.hotel_details' %}active{% endif %}">Hotels</a></li>
+                <li><a href="{{ url_for('main.contact') }}" class="nav_item {% if request.endpoint == 'main.contact' %}active{% endif %}">Contact</a></li>
+                
+                <!-- Display context-specific links based on login states -->
+                {% if current_user.is_authenticated %}
+                    <li class="nav_user">
+                        <span><strong>{{ current_user.first_name }}</strong></span>
+                        <span class="role_badge">{{ current_user.role }}</span>
+                    </li>
+                    
+                    {% if current_user.role == 'admin' %}
+                        <li><a href="{{ url_for('admin.dashboard') }}" class="nav_item {% if request.endpoint and 'admin.' in request.endpoint %}active{% endif %}">Admin Dashboard</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('booking.my_bookings') }}" class="nav_item {% if request.endpoint == 'booking.my_bookings' %}active{% endif %}">My Bookings</a></li>
+                    {% endif %}
+                    
+                    <li><a href="{{ url_for('auth.logout') }}" class="btn btn_outline btn_sm">Logout</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('auth.login') }}" class="btn btn_outline btn_sm">Sign In</a></li>
+                    <li><a href="{{ url_for('auth.register') }}" class="btn btn_primary btn_sm">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </header>
+
+    <!-- Main Container Content -->
+    <main>
+        <!-- Flashed Messages Alerts Section -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes_list">
+                    {% for category, message in messages %}
+                        <li class="alert_box alert_{{ category }}">
+                            <span>{{ message }}</span>
+                            <span style="cursor:pointer; font-weight:bold; font-size:1.2rem; margin-left: 10px;" onclick="this.parentElement.style.display='none';">&times;</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Custom Child Block Template Content -->
+        {% block content %}
+            {% if error_title %}
+                <div class="auth_panel" style="max-width: 600px;">
+                    <h2>{{ error_title }}</h2>
+                    <p style="margin-top: 1rem;">{{ error_msg }}</p>
+                    <a href="{{ url_for('main.index') }}" class="btn btn_primary" style="display:inline-block; margin-top:1.5rem;">Return to Dashboard</a>
+                </div>
+            {% endif %}
+        {% endblock %}
+    </main>
+
+    <!-- Global Footer -->
+    <footer class="global_footer">
+        <div class="footer_grid">
+            <!-- Brand info -->
+            <div class="footer_brand_column">
+                <div class="footer_logo">
+                    <img src="{{ url_for('static', filename='img/BookMyHotel logo.png') }}" class="navbar_logo_img" alt="BookMyHotel Logo" style="margin-right: 0.5rem;">
+                    <span>BookMyHotel</span>
+                </div>
+                <p class="footer_brand_desc">
+                    The premier booking platform for luxury and boutique hotels across Asia and Europe. Over 120 curated properties in 40+ cities.
+                </p>
+            </div>
+            
+            <!-- Discover links -->
+            <div class="footer_links_column">
+                <h4>Discover</h4>
+                <ul>
+                    <li><a href="{{ url_for('main.browse_hotels') }}">All Hotels</a></li>
+                    <li><a href="{{ url_for('main.browse_hotels', region='Asia') }}">Asia Hotels</a></li>
+                    <li><a href="{{ url_for('main.browse_hotels', region='Europe') }}">Europe Hotels</a></li>
+                    <li><a href="{{ url_for('main.index') }}#promotionsSection">Promotions</a></li>
+                </ul>
+            </div>
+            
+            <!-- Account links -->
+            <div class="footer_links_column">
+                <h4>Account</h4>
+                <ul>
+                    <li><a href="{{ url_for('auth.register') }}">Register</a></li>
+                    <li><a href="{{ url_for('auth.login') }}">Sign In</a></li>
+                    <li><a href="{{ url_for('booking.my_bookings') }}">My Bookings</a></li>
+                    <li><a href="#">My Profile</a></li>
+                </ul>
+            </div>
+            
+            <!-- Company links -->
+            <div class="footer_links_column">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="{{ url_for('main.contact') }}">Contact Us</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Cancellation Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer_bottom">
+            <div class="footer_bottom_container">
+                <p>&copy; 2026 BookMyHotel. All rights reserved.</p>
+                <div class="footer_socials">
+                    <a href="#" class="social_icon"><span>f</span></a>
+                    <a href="#" class="social_icon"><span>in</span></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Global JS Files -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

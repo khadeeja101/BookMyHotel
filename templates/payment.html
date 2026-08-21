@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block title %}Secure Checkout - BookMyHotel.com{% endblock %}
+
+{% block content %}
+<div class="checkout_panel">
+    <h2>Secure Checkout & Payment</h2>
+    <p style="color:var(--text_secondary); margin-bottom: 2rem;">Please review your reservation parameters and complete payment securely.</p>
+
+    <form action="{{ url_for('booking.checkout') }}" method="POST" id="checkoutForm">
+        <!-- Hidden input fields needed for backend processing -->
+        <input type="hidden" name="room_id" value="{{ room.id }}">
+        <input type="hidden" name="check_in" value="{{ check_in }}">
+        <input type="hidden" name="check_out" value="{{ check_out }}">
+        <!-- Hidden value holds selected payment tab -->
+        <input type="hidden" name="payment_method" id="selectedPaymentMethod" value="Card">
+        <!-- Hidden helper to read hotel eco ranking for client JS calculation -->
+        <input type="hidden" id="hotelEcoLevel" value="{{ hotel.sustainability_level }}">
+
+        <div class="checkout_grid">
+            
+            <!-- Left Column: Reservation Summary, Optional Services, Payments, and Policies -->
+            <div>
+                
+                <!-- 1. Booking Summary -->
+                <div style="background-color: var(--surface_2); padding: 1.2rem; border-radius: var(--radius); margin-bottom: 2rem; border: 1px solid var(--border);">
+                    <h3 style="font-size: 1.15rem; margin-bottom: 0.8rem; color: var(--white); font-family: 'Playfair Display', serif;">Stay Details</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.95rem; color: var(--text_secondary);">
+                        <div><strong>Hotel:</strong> {{ hotel.name }} ({{ hotel.location }})</div>
+                        <div><strong>Room Type:</strong> {{ room.room_type }}</div>
+                        <div><strong>Check-In Date:</strong> {{ check_in }}</div>
+                        <div><strong>Check-Out Date:</strong> {{ check_out }}</div>
+                        <div><strong>Total Duration:</strong> {{ nights }} Nights</div>
+                        <div><strong>Max Occupancy:</strong> {{ room.max_occupancy }} Guests</div>
+                    </div>
+                </div>
+
+                <!-- 2. Eco-Friendly Choice Highlight -->
+                {% if is_eco_friendly %}
+                    <div class="policy_card" style="background-color: rgba(34, 197, 94, 0.05); border-left-color: var(--success); margin-bottom: 2rem;">
+                        <h4 style="color: #4ade80;">Eco-Friendly Choice Incentives</h4>
+                        <p style="font-size: 0.85rem; color: var(--text_secondary);">
+                            This hotel implements standard sustainability measures (Level {{ hotel.sustainability_level }}/5). 
+                            You have automatically qualified for a **10% Eco-Reward Tax Break** discount on your overall booking stay!
+                        </p>
+                    </div>
+                {% endif %}
+
+                <!-- 3. Add-on Services Selection -->
+                <div style="margin-bottom: 2.5rem;">
+                    <h3 class="checkout_section_title">Enhance Your Stay (Optional Services)</h3>
+                    <p style="font-size: 0.85rem; color: var(--text_muted); margin-bottom: 1rem;">Choose services to include in your hotel reservation. Price listed is a flat fee.</p>
+                    
+                    <div style="display: grid; gap: 1rem;">
+                        {% for svc in services %}
+                            <label class="checkbox_label" style="background:var(--surface_2); padding:1rem; border:1px solid var(--border); border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                                <span style="display:flex; align-items:center; gap:0.8rem;">
+                                    <input type="checkbox" name="services" value="{{ svc.id }}" class="service_cb" data-price="{{ svc.price }}">
+                                    <span style="text-align: left;">
+                                        <strong style="color:var(--white);">{{ svc.name }}</strong><br>
+                                        <small style="color:var(--text_secondary); font-weight:normal;">{{ svc.description }}</small>
+                                    </span>
+                                </span>
+                                <strong style="color:var(--teal_bright);">${{ svc.price }}</strong>
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- 4. Coupon Promo Codes -->
+                <div style="margin-bottom: 2.5rem;">
+                    <h3 class="checkout_section_title">Promotion Code</h3>
+                    <div style="display: flex; gap: 1rem;">
+                        <input type="text" name="promo_code" id="promoCodeInput" class="form_control" style="max-width: 250px;" placeholder="e.g. MARRIOTT20" value="">
+                        <button type="button" id="applyPromoBtn" class="btn btn_ghost" style="border-radius:6px; font-size:0.9rem;">Apply Code</button>
+                    </div>
+                    <div id="promoDisplayInfo" style="font-size: 0.85rem; margin-top: 0.5rem; font-weight: 500;"></div>
+                </div>
+
+                <!-- 5. Transparent Policies and Cancellation -->
+                <div style="margin-bottom: 2.5rem;">
+                    <h3 class="checkout_section_title">Cancellation & Refund Policy</h3>
+                    <div class="policy_card">
+                        <h4>Flexible Stay Cancellation</h4>
+                        <p>
+                            You may cancel this reservation up to **24 hours prior to your scheduled check-in date** (before 12:00 AM of the check-in day) for a **100% full refund** automatically processed to your original payment method. 
+                            Cancellations made within 24 hours of check-in are subject to a late fee equivalent to 1 night stay.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 6. Secure Payment Details -->
+                <div>
+                    <h3 class="checkout_section_title">Secure Payment Processing</h3>
+                    
+                    <div class="payment_tabs">
+                        <button type="button" class="payment_tab active" data-method="Card">Credit / Debit Card</button>
+                        <button type="button" class="payment_tab" data-method="PayPal">PayPal Account</button>
+                    </div>
+
+                    <!-- Credit Card Panels -->
+                    <div class="payment_details_panel active" id="payPanelCard">
+                        <div class="form_group">
+                            <label for="cardName" class="form_label">Cardholder Name</label>
+                            <input type="text" id="cardName" class="form_control" placeholder="John Doe">
+                        </div>
+                        <div class="form_group">
+                            <label for="cardNumberInput" class="form_label">Card Number</label>
+                            <input type="text" name="card_number" id="cardNumberInput" class="form_control" placeholder="1234 5678 1234 5678" required>
+                        </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                            <div class="form_group">
+                                <label for="cardExpiry" class="form_label">Expiry Date</label>
+                                <input type="text" id="cardExpiry" class="form_control" placeholder="MM/YY">
+                            </div>
+                            <div class="form_group">
+                                <label for="cardCvv" class="form_label">CVV</label>
+                                <input type="password" id="cardCvv" class="form_control" placeholder="***">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PayPal Panels -->
+                    <div class="payment_details_panel" id="payPanelPayPal">
+                        <div class="form_group">
+                            <label for="paypalEmailInput" class="form_label">PayPal Email Address</label>
+                            <input type="email" name="paypal_email" id="paypalEmailInput" class="form_control" placeholder="user@paypal.com">
+                        </div>
+                        <p style="font-size:0.85rem; color:var(--text_secondary); text-align: left;">You will be redirected to securely authorize authentication on PayPal servers upon clicking submit.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Final Price Summary & Checkout Action -->
+            <div>
+                <div class="booking_sidebar_card">
+                    <h3 style="margin-bottom:1.2rem; border-bottom:1px solid var(--border); padding-bottom:0.5rem; color:var(--white); font-family: 'Playfair Display', serif;">Billing Invoice</h3>
+                    
+                    <div class="sidebar_summary_row">
+                        <span>Base Room Cost:</span>
+                        <!-- Store raw cost in data attribute to be parsed by JS checkout calculator -->
+                        <span id="baseRoomCost" data-cost="{{ room_cost }}">${{ "%.2f"|format(room_cost) }}</span>
+                    </div>
+
+                    <div class="sidebar_summary_row">
+                        <span>Optional Services:</span>
+                        <span id="summaryServices">$0.00</span>
+                    </div>
+
+                    <div class="sidebar_summary_row" style="border-top:1px dashed var(--border); padding-top:0.8rem; margin-top:0.8rem;">
+                        <span>Subtotal:</span>
+                        <span id="summarySubtotal">${{ "%.2f"|format(room_cost) }}</span>
+                    </div>
+
+                    <div class="sidebar_summary_row" style="color: #4ade80;">
+                        <span>Discounts & Incentives:</span>
+                        <span id="summaryDiscount">-$0.00</span>
+                    </div>
+
+                    <div class="sidebar_total" style="border-top:1px solid var(--border);">
+                        <span>Total:</span>
+                        <span id="summaryTotal">${{ "%.2f"|format(room_cost) }}</span>
+                    </div>
+
+                    <div style="display:flex; justify-content:center; margin-top: 1.5rem;">
+                        <button type="submit" class="btn btn_primary" style="padding:1rem 2.5rem; font-size:1.05rem; min-width: 220px;">
+                            Confirm Payment
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+{% endblock %}

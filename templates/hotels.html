@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+
+{% block title %}BookMyHotel.com - Browse Curated Hotels{% endblock %}
+
+{% block content %}
+<div class="browse_layout_container">
+    <!-- Breadcrumb row -->
+    <div class="breadcrumb_row">
+        <a href="{{ url_for('main.index') }}">Home</a> › <span>Hotels</span>
+    </div>
+
+    <!-- Header title -->
+    <div class="browse_header">
+        <h1>Our Hotels</h1>
+        <p>Discover {{ total_hotels_count }} curated properties across Asia & Europe</p>
+    </div>
+
+    <!-- Main columns grid -->
+    <div class="browse_grid">
+        
+        <!-- Sidebar filters on the left -->
+        <aside class="filters_sidebar">
+            <div class="sidebar_card">
+                <div class="sidebar_title_row">
+                    <h3>Filters</h3>
+                </div>
+                
+                <form action="{{ url_for('main.browse_hotels') }}" method="GET" id="sidebarFiltersForm" class="sidebar_form">
+                    <!-- Hidden inputs to track region and stars selections -->
+                    <input type="hidden" name="region" id="selectedRegionInput" value="{{ selected_region or 'All' }}">
+                    <input type="hidden" name="rating" id="selectedRatingInput" value="{{ selected_rating or '' }}">
+                    
+                    <!-- Search query field -->
+                    <div class="sidebar_field">
+                        <label for="sidebarSearchInput">Search</label>
+                        <input type="text" name="location" id="sidebarSearchInput" class="sidebar_input" placeholder="City, country, hotel..." value="{{ selected_location }}">
+                    </div>
+
+                    <!-- Region Capsules selection -->
+                    <div class="sidebar_field">
+                        <label>Region</label>
+                        <div class="region_capsules_container">
+                            <button type="button" class="region_cap_btn {% if not selected_region or selected_region.lower() == 'all' %}active{% endif %}" onclick="setRegionFilter('All')">All</button>
+                            <button type="button" class="region_cap_btn {% if selected_region.lower() == 'asia' %}active{% endif %}" onclick="setRegionFilter('Asia')">Asia</button>
+                            <button type="button" class="region_cap_btn {% if selected_region.lower() == 'europe' %}active{% endif %}" onclick="setRegionFilter('Europe')">Europe</button>
+                        </div>
+                    </div>
+
+                    <!-- Category dropdown selection -->
+                    <div class="sidebar_field">
+                        <label for="sidebarCategory">Category</label>
+                        <select name="category" id="sidebarCategory" class="sidebar_input" onchange="this.form.submit()">
+                            <option value="All" {% if not selected_category or selected_category.lower() == 'all' %}selected{% endif %}>All</option>
+                            <option value="Luxury" {% if selected_category.lower() == 'luxury' %}selected{% endif %}>Luxury</option>
+                            <option value="Boutique" {% if selected_category.lower() == 'boutique' %}selected{% endif %}>Boutique</option>
+                        </select>
+                    </div>
+
+                    <!-- Max Price Slider selection -->
+                    <div class="sidebar_field">
+                        <div class="slider_label_row">
+                            <label for="priceMaxSlider">Max Price</label>
+                            <span class="slider_value_text">$<span id="sliderValueText">{{ selected_price or '1000' }}</span>/night</span>
+                        </div>
+                        <input type="range" name="price_max" id="priceMaxSlider" class="price_slider" min="50" max="1000" step="10" value="{{ selected_price or '1000' }}" oninput="updateSliderText(this.value)" onchange="this.form.submit()">
+                        <div class="slider_bounds">
+                            <span>$50</span>
+                            <span>$1,000+</span>
+                        </div>
+                    </div>
+
+                    <!-- Min Stars Selection -->
+                    <div class="sidebar_field">
+                        <label>Min Stars</label>
+                        <div class="stars_capsules_container">
+                            <button type="button" class="stars_cap_btn {% if not selected_rating %}active{% endif %}" onclick="setRatingFilter('')">Any</button>
+                            <button type="button" class="stars_cap_btn {% if selected_rating == '3' %}active{% endif %}" onclick="setRatingFilter('3')">3★</button>
+                            <button type="button" class="stars_cap_btn {% if selected_rating == '4' %}active{% endif %}" onclick="setRatingFilter('4')">4★</button>
+                            <button type="button" class="stars_cap_btn {% if selected_rating == '5' %}active{% endif %}" onclick="setRatingFilter('5')">5★</button>
+                        </div>
+                    </div>
+
+                    <!-- Clear filters link -->
+                    <a href="{{ url_for('main.browse_hotels') }}" class="btn_clear_filters">❌ Clear Filters</a>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Listings results on the right -->
+        <main class="listings_results">
+            <!-- Results statistics row -->
+            <div class="results_stats_row">
+                <div class="results_count_text">
+                    <strong>{{ hotels|length }}</strong> hotels found
+                </div>
+                <div class="results_sort_field">
+                    <span>Sort by:</span>
+                    <select id="resultsSorting" class="sort_select_input">
+                        <option value="topRated">Top Rated</option>
+                        <option value="priceLowHigh">Price: Low to High</option>
+                        <option value="priceHighLow">Price: High to Low</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Horizontal Hotel Cards List -->
+            <div class="horizontal_hotels_list">
+                {% for hotel in hotels %}
+                    <div class="hotel_horizontal_card">
+                        
+                        <!-- Left: Image Section with badge overlays -->
+                        <div class="card_left_image_wrap">
+                            {% if 'Dubai' in hotel.location %}
+                                <img src="https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=800&q=80" alt="{{ hotel.name }}">
+                            {% elif 'Paris' in hotel.location %}
+                                <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80" alt="{{ hotel.name }}">
+                            {% elif 'Tokyo' in hotel.location %}
+                                <img src="https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80" alt="{{ hotel.name }}">
+                            {% else %}
+                                <img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80" alt="{{ hotel.name }}">
+                            {% endif %}
+                            
+                            <span class="badge_card_overlay left_overlay_tag">
+                                {% if loop.index == 1 %}Editor's Choice{% elif loop.index == 2 %}Highly Rated{% else %}Best Value{% endif %}
+                            </span>
+                            <span class="badge_card_overlay right_overlay_tag">
+                                {% if loop.index == 1 %}-15%{% elif loop.index == 2 %}-20%{% else %}-10%{% endif %}
+                            </span>
+                        </div>
+
+                        <!-- Right: Content Section -->
+                        <div class="card_right_content">
+                            <!-- Header (location + star review icons) -->
+                            <div class="card_meta_header">
+                                <span class="card_location_text">
+                                    {{ hotel.location }} · 
+                                    {% if 'Dubai' in hotel.location or 'Tokyo' in hotel.location %}Asia{% else %}Europe{% endif %}
+                                </span>
+                                <div class="card_star_icons">
+                                    {% for i in range(hotel.rating) %}★{% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Title -->
+                            <h2 class="card_hotel_title">{{ hotel.name }}</h2>
+
+                            <!-- Review score summary -->
+                            <div class="card_review_score_row">
+                                <span class="score_badge">{{ hotel.temp_avg_rating }} ★</span>
+                                <span class="score_reviews_count">({{ hotel.temp_review_count }} reviews)</span>
+                                <span class="score_category_tag">
+                                    {% if 'Marriott' in hotel.name or 'Four Seasons' in hotel.name %}Luxury{% else %}Boutique{% endif %}
+                                </span>
+                            </div>
+
+                            <!-- Description Snippet -->
+                            <p class="card_description_text">{{ hotel.description[:200] }}...</p>
+
+                            <!-- Amenities list -->
+                            <div class="card_amenities_list">
+                                <span class="amenity_tag">Free WiFi</span>
+                                {% if 'Dubai' in hotel.location %}
+                                    <span class="amenity_tag">Infinity Pool</span>
+                                    <span class="amenity_tag">Spa</span>
+                                    <span class="amenity_tag">Gym</span>
+                                    <span class="amenity_tag">Fine Dining</span>
+                                {% elif 'Paris' in hotel.location %}
+                                    <span class="amenity_tag">Fine Dining</span>
+                                    <span class="amenity_tag">Bar</span>
+                                    <span class="amenity_tag">Breakfast</span>
+                                    <span class="amenity_tag">Bicycle Rental</span>
+                                {% elif 'Tokyo' in hotel.location %}
+                                    <span class="amenity_tag">Onsen</span>
+                                    <span class="amenity_tag">Kaiseki Dining</span>
+                                    <span class="amenity_tag">Tea Ceremony</span>
+                                {% else %}
+                                    <span class="amenity_tag">Fitness Center</span>
+                                    <span class="amenity_tag">Lounge</span>
+                                    <span class="amenity_tag">Spa</span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Card Footer pricing and action -->
+                            <div class="card_action_footer">
+                                <div class="card_price_col">
+                                    <span class="price_prefix">From per night</span>
+                                    <span class="price_value">${{ hotel.temp_min_price }}</span>
+                                </div>
+                                <a href="{{ url_for('main.hotel_details', hotel_id=hotel.id) }}" class="btn btn_primary">
+                                    View Rooms →
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="auth_panel" style="max-width: 600px; margin: 3rem auto;">
+                        <h3>No Rooms Found</h3>
+                        <p style="margin-top: 1rem; color: var(--text_secondary);">We couldn't find any rooms matching your search parameters. Try adjusting your filters or search values.</p>
+                        <a href="{{ url_for('main.browse_hotels') }}" class="btn btn_primary" style="display:inline-block; margin-top:1.5rem;">Reset Filters</a>
+                    </div>
+                {% endfor %}
+            </div>
+        </main>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // JS filters handling functions
+    function setRegionFilter(region) {
+        document.getElementById('selectedRegionInput').value = region;
+        document.getElementById('sidebarFiltersForm').submit();
+    }
+
+    function setRatingFilter(rating) {
+        document.getElementById('selectedRatingInput').value = rating;
+        document.getElementById('sidebarFiltersForm').submit();
+    }
+
+    function updateSliderText(value) {
+        document.getElementById('sliderValueText').innerText = value;
+    }
+</script>
+{% endblock %}

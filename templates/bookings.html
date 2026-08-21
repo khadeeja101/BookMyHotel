@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}My Bookings - BookMyHotel.com{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 3rem;">
+    <h1>My Reservation Dashboard</h1>
+    <p style="color:var(--text_secondary);">Manage your current and upcoming hotel reservations and view your historical stays.</p>
+</div>
+
+<!-- Section 1: Active and Future Bookings -->
+<section style="margin-bottom: 4rem;">
+    <h2>Upcoming Trips</h2>
+    <p style="color:var(--text_secondary); margin-bottom:1.5rem;">Reservations scheduled for future stay dates. You can cancel these bookings up to 24 hours prior to check-in for a full automatic refund.</p>
+
+    {% if future_bookings|length == 0 %}
+        <div style="background-color: var(--surface); padding: 2rem; border-radius: var(--radius); text-align: center; border: 1px solid var(--border); box-shadow: var(--shadow);">
+            <p style="color:var(--text_secondary); font-size: 0.95rem;">You do not have any upcoming reservations booked.</p>
+            <a href="{{ url_for('main.index') }}" class="btn btn_primary" style="display:inline-block; margin-top: 1rem;">Find and Book Rooms</a>
+        </div>
+    {% else %}
+        <div class="table_container">
+            <table class="custom_table">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Hotel & Location</th>
+                        <th>Room Category</th>
+                        <th>Check-In</th>
+                        <th>Check-Out</th>
+                        <th>Amount Paid</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for res in future_bookings %}
+                        <tr>
+                            <td><strong>#{{ res.id }}</strong></td>
+                            <td>
+                                <strong style="color:var(--white);">{{ res.room.hotel.name }}</strong><br>
+                                <span style="font-size:0.85rem; color:var(--text_muted);">{{ res.room.hotel.location }}</span>
+                            </td>
+                            <td>{{ res.room.room_type }}</td>
+                            <td>{{ res.check_in.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ res.check_out.strftime('%Y-%m-%d') }}</td>
+                            <td><strong style="color:var(--teal_bright);">${{ "%.2f"|format(res.total_amount) }}</strong></td>
+                            <td>
+                                <span class="status_tag status_confirmed">Confirmed</span>
+                                {% for p in res.payments %}
+                                    <span class="status_tag status_paid" style="font-size: 0.7rem; margin-top: 2px; display:inline-block;">{{ p.payment_method }} Paid</span>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <!-- Cancellation form triggers dummy refund and confirms action -->
+                                <form action="{{ url_for('booking.cancel_booking', reservation_id=res.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this booking? This will issue a full automatic refund of your payment.');">
+                                    <button type="submit" class="btn btn_danger btn_sm">
+                                        Cancel Booking
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</section>
+
+<!-- Section 2: Historical Stays & Cancellations -->
+<section>
+    <h2>Past Stays & Cancellations</h2>
+    <p style="color:var(--text_secondary); margin-bottom:1.5rem;">Your historical visits, checked-out reservations, and cancelled bookings.</p>
+
+    {% if past_bookings|length == 0 %}
+        <div style="background-color: var(--surface); padding: 2rem; border-radius: var(--radius); text-align: center; border: 1px solid var(--border); box-shadow: var(--shadow);">
+            <p style="color:var(--text_secondary); font-size: 0.95rem;">No past booking logs found in your account.</p>
+        </div>
+    {% else %}
+        <div class="table_container">
+            <table class="custom_table">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Hotel & Location</th>
+                        <th>Room Category</th>
+                        <th>Stay Dates</th>
+                        <th>Amount</th>
+                        <th>Reservation Status</th>
+                        <th>Payment Status</th>
+                        <th>Reviews</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for res in past_bookings %}
+                        <tr>
+                            <td>#{{ res.id }}</td>
+                            <td>
+                                <span style="color:var(--white); font-weight:600;">{{ res.room.hotel.name }}</span><br>
+                                <span style="font-size:0.85rem; color:var(--text_muted);">{{ res.room.hotel.location }}</span>
+                            </td>
+                            <td>{{ res.room.room_type }}</td>
+                            <td>
+                                <span style="font-size:0.85rem;">{{ res.check_in.strftime('%m/%d/%Y') }} - {{ res.check_out.strftime('%m/%d/%Y') }}</span>
+                            </td>
+                            <td>${{ "%.2f"|format(res.total_amount) }}</td>
+                            <td>
+                                {% if res.status == 'Confirmed' %}
+                                    <span class="status_tag status_confirmed">Completed</span>
+                                {% else %}
+                                    <span class="status_tag status_cancelled">Cancelled</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% for p in res.payments %}
+                                    {% if p.status == 'Paid' %}
+                                        <span class="status_tag status_paid" style="font-size:0.75rem;">Paid</span>
+                                    {% else %}
+                                        <span class="status_tag status_refunded" style="font-size:0.75rem;">Refunded (${{ "%.2f"|format(p.amount) }})</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% if res.status == 'Confirmed' %}
+                                    {% if res.temp_has_reviewed %}
+                                        <span style="color:#4ade80; font-weight:600; font-size:0.85rem;">✓ Feedback Submitted</span>
+                                    {% else %}
+                                        <a href="{{ url_for('main.hotel_details', hotel_id=res.room.hotel_id) }}" class="view_details_btn" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                                            Write Review
+                                        </a>
+                                    {% endif %}
+                                {% else %}
+                                    <span style="color:var(--text_muted); font-size:0.85rem;">N/A</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ hotel.name }} - BookMyHotel.com{% endblock %}
+
+{% block content %}
+<div class="property_layout">
+    
+    <!-- Left Column: Hotel Info, Rooms list, Calendar, Reviews -->
+    <div>
+        <!-- Hotel Banner Hero card -->
+        <div class="property_hero">
+            {% if 'Dubai' in hotel.location %}
+                <img src="https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=800&q=80" alt="{{ hotel.name }}" class="property_banner">
+            {% elif 'Paris' in hotel.location %}
+                <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80" alt="{{ hotel.name }}" class="property_banner">
+            {% elif 'Tokyo' in hotel.location %}
+                <img src="https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80" alt="{{ hotel.name }}" class="property_banner">
+            {% else %}
+                <img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80" alt="{{ hotel.name }}" class="property_banner">
+            {% endif %}
+            
+            <div class="property_info">
+                <div class="property_header_row">
+                    <div>
+                        <h1>{{ hotel.name }}</h1>
+                        <div class="property_meta">
+                            <span>{{ hotel.location }}</span>
+                            <span>⭐ {{ avg_rating }} Rating ({{ review_count }} Reviews)</span>
+                        </div>
+                    </div>
+                    <div class="stars_badge" style="font-size: 1.5rem;">
+                        {% for i in range(hotel.rating) %}⭐{% endfor %}
+                    </div>
+                </div>
+                
+                <p class="property_description">{{ hotel.description }}</p>
+
+                <!-- Sustainability and Cleanliness details -->
+                <div style="border-top:1px dashed var(--border); padding-top:1.5rem; margin-top:1.5rem; display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div>
+                        <h4 style="color:var(--white); font-size:0.95rem; font-weight:600;">Eco-Friendly Practices (Level {{ hotel.sustainability_level }}/5)</h4>
+                        <p style="font-size:0.85rem; color:var(--text_secondary); margin-top:0.3rem;">
+                            Supports smart crowd management, sustainable energy consumption. 
+                            {% if hotel.sustainability_level >= 4 %}
+                                <strong style="color:var(--white);">Save 10% on stay fees automatically as an Eco-Reward tax break!</strong>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div>
+                        <h4 style="color:var(--white); font-size:0.95rem; font-weight:600;">Sanitization & Health Standards (Level {{ hotel.cleanliness_level }}/5)</h4>
+                        <p style="font-size:0.85rem; color:var(--text_secondary); margin-top:0.3rem;">
+                            Equipped with high-grade antibacterial sanitizing products in all public areas and individual room kits.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Promotions/Discounts alert -->
+        {% if promotions %}
+            <div style="margin: 2rem 0; padding: 1.25rem; background: rgba(101, 220, 213, 0.08); border: 1.5px dashed var(--teal-bright); border-radius: var(--radius); text-align: left; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;">
+                <div>
+                    <h3 style="color: var(--teal-bright); font-size: 1.1rem; margin-bottom: 0.25rem; font-family: 'Poppins', sans-serif;">Active Promotion Discount Live!</h3>
+                    {% for promo in promotions %}
+                        <p style="font-size: 0.9rem; color: var(--text_secondary); margin-top: 0.4rem;">
+                            Save <strong>{{ promo.discount_percent|round|int }}%</strong> using code <span class="promo_coupon_code" style="display:inline-block; font-size:0.8rem; padding: 0.2rem 0.5rem; background: rgba(101, 220, 213, 0.08); border: 1px dashed rgba(101, 220, 213, 0.3); border-radius: 4px; color: var(--teal-bright); font-family: monospace;">{{ promo.code }}</span> - <em>{{ promo.description }}</em>.
+                        </p>
+                    {% endfor %}
+                </div>
+                <div style="font-size: 2rem;"></div>
+            </div>
+        {% endif %}
+
+        <!-- Room Types Available -->
+        <div class="rooms_section">
+            <h2>Select Room Category</h2>
+            <p style="color:var(--text_secondary); margin-bottom:1.5rem;">Choose from our selection of premium suites and double/single rooms.</p>
+            
+            {% for room in rooms %}
+                <div class="room_card">
+                    <div class="room_details">
+                        <h3>{{ room.room_type }}</h3>
+                        <p style="font-size:0.9rem; color:var(--text_secondary); margin:0.3rem 0;">Max Occupancy: {{ room.max_occupancy }} Guests</p>
+                        <div class="room_amenities">
+                            {% for amenity in room.amenities.split(',') %}
+                                <span class="badge badge_clean" style="display:inline-block; margin-bottom:0.2rem;">{{ amenity.strip() }}</span>
+                            {% endfor %}
+                        </div>
+                        <p style="font-size:0.9rem; color:var(--text_secondary);">{{ room.description }}</p>
+                    </div>
+                    <div class="room_booking_action">
+                        <div class="room_price">
+                            ${{ room.base_rate }}<small>/ night</small>
+                        </div>
+                        <span style="font-size:0.8rem; color:var(--text_muted);">Available Rooms: {{ room.available_rooms }} of {{ room.total_rooms }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Dynamic Calendar Section -->
+        <div class="rooms_section" style="margin-top: 4rem;">
+            <h2>Rates & Availability Calendar</h2>
+            <p style="color:var(--text_secondary); margin-bottom: 1.5rem;">
+                Select a room type below to load its monthly calendar. Click on a check-in date, then a check-out date to select your reservation range directly. Weekend rates (+20%) and seasonal markups are calculated dynamically.
+            </p>
+
+            <div class="calendar_widget">
+                <div class="calendar_header">
+                    <!-- Room selection trigger -->
+                    <div class="form_group" style="margin-bottom:0; flex-grow:1; max-width: 300px;">
+                        <select id="calendarRoomSelect" class="form_control">
+                            {% for room in rooms %}
+                                <option value="{{ room.id }}">{{ room.room_type }} - (${{ room.base_rate }}/night)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Month nav controllers -->
+                    <div style="display:flex; align-items:center; gap:1rem;">
+                        <button id="calendarPrevMonth" class="calendar_nav_btn">&lt;</button>
+                        <span id="calendarMonthTitle" class="calendar_title_text">July 2026</span>
+                        <button id="calendarNextMonth" class="calendar_nav_btn">&gt;</button>
+                    </div>
+                </div>
+
+                <!-- Calendar days rendered here by main.js -->
+                <div id="calendarContainer" data-hotel-id="{{ hotel.id }}">
+                    <!-- JS Grid injected here -->
+                </div>
+
+                <!-- Calendar Legend -->
+                <div class="calendar_legend">
+                    <div class="legend_item">
+                        <div class="legend_color" style="background-color:var(--surface_2);"></div>
+                        <span>Available (Dynamic rates shown)</span>
+                    </div>
+                    <div class="legend_item">
+                        <div class="legend_color" style="background-color:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.25);"></div>
+                        <span>Sold Out / Unavailable</span>
+                    </div>
+                    <div class="legend_item">
+                        <div class="legend_color" style="background-color:var(--teal);"></div>
+                        <span>Your Selected Dates</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Guest Reviews & Ratings Section -->
+        <div class="rooms_section" style="margin-top: 4rem;">
+            <h2>Guest Reviews</h2>
+            <p style="color:var(--text_secondary); margin-bottom:1.5rem;">Read what our guests are saying about their stays.</p>
+
+            {% if current_user.is_authenticated %}
+                <div class="review_card" style="margin-bottom: 2rem;">
+                    <h3 style="font-size:1.1rem; margin-bottom: 1rem; color:var(--white);">Post Your Feedback</h3>
+                    <form action="{{ url_for('main.submit_review', hotel_id=hotel.id) }}" method="POST">
+                        <div class="form_group">
+                            <label for="ratingInput" class="form_label">Rating (1 to 5 Stars)</label>
+                            <select name="rating" id="ratingInput" class="form_control" style="max-width:150px;" required>
+                                <option value="5">⭐⭐⭐⭐⭐</option>
+                                <option value="4">⭐⭐⭐⭐</option>
+                                <option value="3">⭐⭐⭐</option>
+                                <option value="2">⭐⭐</option>
+                                <option value="1">⭐</option>
+                            </select>
+                        </div>
+                        <div class="form_group">
+                            <label for="commentInput" class="form_label">Comment</label>
+                            <textarea name="comment" id="commentInput" class="form_control" rows="3" placeholder="Tell us about your room, cleanliness and services..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn_primary">Post Review</button>
+                    </form>
+                </div>
+            {% else %}
+                <p style="font-size:0.9rem; background-color:var(--surface_2); border:1px solid var(--border); padding: 0.8rem; border-radius:8px; margin-bottom: 2rem; text-align: center; color:var(--text_secondary);">
+                    Please <a href="{{ url_for('auth.login') }}">login</a> to post a review.
+                </p>
+            {% endif %}
+
+            {% if reviews|length == 0 %}
+                <p style="color:var(--text_secondary);">No reviews written yet. Be the first to leave a feedback!</p>
+            {% else %}
+                {% for review in reviews %}
+                    <div class="review_card">
+                        <div class="review_author">
+                            <span>{{ review.user.first_name }} {{ review.user.last_name }}</span>
+                            <span style="color:#F4C430;">
+                                {% for i in range(review.rating) %}⭐{% endfor %}
+                            </span>
+                        </div>
+                        <p class="review_comment">{{ review.comment }}</p>
+                        <span style="font-size:0.75rem; color:var(--text_muted);">Posted on {{ review.created_at.strftime('%Y-%m-%d') }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Right Column: Booking Sidebar Reservation details -->
+    <div class="booking_sidebar_wrapper">
+        <div class="booking_sidebar_card">
+            <h3 style="margin-bottom:1.2rem; border-bottom:1px solid var(--border); padding-bottom:0.5rem; color:var(--white);">Reservation Summary</h3>
+            
+            <form action="{{ url_for('booking.checkout') }}" method="GET">
+                <!-- Inputs are automatically populated when users select dates on calendar -->
+                <div class="form_group">
+                    <label for="sidebarRoomName" class="form_label">Selected Room Category</label>
+                    <input type="text" id="sidebarRoomName" class="form_control" readonly value="" style="background-color:var(--purple_dark); font-weight:500;">
+                    <!-- Hidden field holds selected room id -->
+                    <input type="hidden" name="room_id" id="sidebarRoomId">
+                </div>
+
+                <div class="form_group">
+                    <label for="sidebarCheckIn" class="form_label">Check-In Date</label>
+                    <input type="text" name="check_in" id="sidebarCheckIn" class="form_control" readonly required placeholder="Click dates on calendar">
+                </div>
+
+                <div class="form_group">
+                    <label for="sidebarCheckOut" class="form_label">Check-Out Date</label>
+                    <input type="text" name="check_out" id="sidebarCheckOut" class="form_control" readonly required placeholder="Click dates on calendar">
+                </div>
+
+                <div class="sidebar_summary_row" style="margin-top: 1.5rem;">
+                    <span>Total Nights:</span>
+                    <strong id="sidebarNights" style="color:var(--white);">0</strong>
+                </div>
+
+                <div class="sidebar_total">
+                    <span>Est. Room Cost:</span>
+                    <span id="sidebarEstTotal">$0.00</span>
+                </div>
+
+                <p style="font-size:0.8rem; color:var(--text_muted); margin:1.2rem 0; line-height: 1.4;">
+                    * Add-on services, eco incentives and coupon promotions are applied on the checkout payment page.
+                </p>
+
+                <!-- Book action -->
+                <button type="submit" id="sidebarBookBtn" class="btn btn_primary btn_full" disabled>
+                    Proceed to Payment
+                </button>
+            </form>
+        </div>
+
+        <!-- Cancellation & Refund Policy Card -->
+        <div class="booking_sidebar_card" style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.15);">
+            <h4 style="margin-bottom: 0.8rem; color: var(--danger); font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; font-family: 'Poppins', sans-serif;">
+                Cancellation & Refund Policy
+            </h4>
+            <p style="font-size: 0.8rem; color: var(--text_secondary); line-height: 1.5; margin-bottom: 0.5rem;">
+                We offer free cancellations and <strong>100% automatic refunds</strong> for all bookings up to <strong>24 hours</strong> prior to your scheduled check-in time.
+            </p>
+            <p style="font-size: 0.75rem; color: var(--text_muted); line-height: 1.4;">
+                Cancellations requested within 24 hours of check-in are subject to a fee equal to the first night's stay. All processed refunds are instantly credited back to your original payment method.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Link calendar dropdown triggers to booking form inputs
+    const roomSelect = document.getElementById("calendarRoomSelect");
+    const roomInputName = document.getElementById("sidebarRoomName");
+    const roomInputId = document.getElementById("sidebarRoomId");
+
+    function syncRoomSelection() {
+        if (roomSelect && roomInputName && roomInputId) {
+            const selectedOpt = roomSelect.options[roomSelect.selectedIndex];
+            roomInputName.value = selectedOpt.text.split(" - ")[0];
+            roomInputId.value = roomSelect.value;
+        }
+    }
+
+    if (roomSelect) {
+        roomSelect.addEventListener("change", syncRoomSelection);
+        syncRoomSelection(); // init
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Receipt #{{ reservation.id }} - BookMyHotel.com{% endblock %}
+
+{% block content %}
+<div class="auth_panel" style="max-width: 650px; text-align: left; margin: 4rem auto; border-color: var(--teal-bright); box-shadow: var(--shadow_teal);">
+    
+    <!-- Success Header -->
+    <div style="text-align: center; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem;">
+        <div style="width: 60px; height: 60px; background: rgba(34, 197, 94, 0.1); border: 2px solid var(--success); color: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1rem auto; box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);">
+            ✓
+        </div>
+        <h2 style="color: var(--white); font-family: 'Playfair Display', serif; margin-bottom: 0.5rem;">Booking Confirmed!</h2>
+        <p style="color: var(--text_secondary); font-size: 0.95rem;">Thank you for your stay selection. Your payment receipt is processed below.</p>
+    </div>
+
+    <!-- Receipt Details List -->
+    <div class="receipt_body" style="display: flex; flex-direction: column; gap: 1.25rem; font-size: 0.9rem;">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; border-bottom: 1px dashed var(--border); padding-bottom: 1.25rem;">
+            <div>
+                <span style="color: var(--text_muted); font-size: 0.75rem; text-transform: uppercase;">Receipt Code</span>
+                <strong style="display: block; color: var(--white); margin-top: 2px;">#BMH-{{ reservation.id }}-{{ payment.id if payment else '0' }}</strong>
+            </div>
+            <div>
+                <span style="color: var(--text_muted); font-size: 0.75rem; text-transform: uppercase;">Transaction ID</span>
+                <strong style="display: block; color: var(--teal-bright); font-family: monospace; margin-top: 2px;">{{ payment.transaction_id if payment else 'TXN-DUMMY' }}</strong>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; border-bottom: 1px dashed var(--border); padding-bottom: 1.25rem;">
+            <div>
+                <span style="color: var(--text_muted); font-size: 0.75rem; text-transform: uppercase;">Hotel Property</span>
+                <strong style="display: block; color: var(--white); margin-top: 2px;">{{ reservation.room.hotel.name }}</strong>
+                <span style="font-size: 0.8rem; color: var(--text_secondary);">{{ reservation.room.hotel.location }}</span>
+            </div>
+            <div>
+                <span style="color: var(--text_muted); font-size: 0.75rem; text-transform: uppercase;">Room Category</span>
+                <strong style="display: block; color: var(--white); margin-top: 2px;">{{ reservation.room.room_type }}</strong>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; border-bottom: 1px dashed var(--border); padding-bottom: 1.25rem;">
+            <div>
+                <span style="color: var(--text_muted); font-size: 0.75rem; text-transform: uppercase;">Check-In Date</span>
+                <strong style="display: block; color: var(--white); margin-top: 2px;">{{ reservation.check_in.strftime('%B %d, %Y') }}</strong>
+            </div>
+            <div>
+                <span style="color: var(--text_muted); font-size: 0.75rem; text-transform: uppercase;">Check-Out Date</span>
+                <strong style="display: block; color: var(--white); margin-top: 2px;">{{ reservation.check_out.strftime('%B %d, %Y') }}</strong>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; border-bottom: 1px dashed var(--border); padding-bottom: 1.25rem;">
+            <div>
+                <span style="color: var(--text_muted); font-size: 0.75rem; text-transform: uppercase;">Payment Option</span>
+                <strong style="display: block; color: var(--white); margin-top: 2px;">{{ payment.payment_method if payment else 'Credit Card' }}</strong>
+            </div>
+            <div>
+                <span style="color: var(--text_muted); font-size: 0.75rem; text-transform: uppercase;">Payment Status</span>
+                <strong style="display: block; color: var(--success); margin-top: 2px;">Paid / Confirmed</strong>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(101,220,213,0.05); padding: 1rem; border-radius: var(--radius_sm); border: 1px solid var(--border); margin-top: 0.5rem;">
+            <span style="color: var(--white); font-weight: 600;">Total Amount Paid:</span>
+            <span style="font-size: 1.4rem; font-weight: 700; color: var(--teal-bright);">${{ "%.2f"|format(reservation.total_amount) }}</span>
+        </div>
+
+    </div>
+
+    <!-- Actions Row -->
+    <div style="display: flex; gap: 1rem; margin-top: 2.2rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+        <button onclick="window.print()" class="btn btn_outline" style="flex: 1;">Print Receipt</button>
+        <a href="{{ url_for('booking.my_bookings') }}" class="btn btn_primary" style="flex: 1.5; text-align: center; display: inline-block;">Go to My Bookings</a>
+    </div>
+
+</div>
+{% endblock %}

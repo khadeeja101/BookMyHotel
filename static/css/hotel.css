@@ -1,0 +1,348 @@
+/* Hotel Details Layout */
+.property_layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2.5rem;
+}
+
+@media (max-width: 900px) {
+    .property_layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.property_hero {
+    background: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    margin-bottom: 2rem;
+}
+
+.property_banner {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    background-color: var(--purple_dark);
+}
+
+.property_info {
+    padding: 2rem;
+}
+
+.property_header_row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.property_meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+    color: var(--text_secondary);
+}
+
+.property_meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.property_description {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--text_secondary);
+    margin-top: 1.5rem;
+}
+
+/* Room Categories Selection block */
+.rooms_section {
+    margin-top: 3rem;
+}
+
+.room_card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+    align-items: center;
+    transition: all var(--transition);
+}
+
+.room_card:hover {
+    border-color: var(--border_strong);
+    box-shadow: var(--shadow_teal);
+}
+
+@media (max-width: 600px) {
+    .room_card {
+        grid-template-columns: 1fr;
+    }
+}
+
+.room_details h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: var(--white);
+}
+
+.room_amenities {
+    font-size: 0.85rem;
+    color: var(--text_muted);
+    margin: 0.5rem 0 1rem 0;
+}
+
+.room_booking_action {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.room_price {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--white);
+}
+
+.room_price small {
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: var(--text_muted);
+}
+
+/* Custom Rates and Availability Calendar Grid */
+.calendar_widget {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    margin-bottom: 2rem;
+}
+
+.calendar_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    gap: 1rem;
+}
+
+.calendar_title_text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--white);
+}
+
+.calendar_nav_btn {
+    background: none;
+    border: 1px solid var(--border);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: var(--teal_bright);
+    transition: all var(--transition);
+    cursor: pointer;
+}
+
+.calendar_nav_btn:hover {
+    background-color: rgba(101, 220, 213, 0.1);
+    border-color: var(--teal_bright);
+}
+
+.calendar_grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.4rem;
+    text-align: center;
+}
+
+.calendar_day_header {
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--text_muted);
+    padding-bottom: 0.5rem;
+    text-transform: uppercase;
+}
+
+.calendar_cell {
+    border-radius: 8px;
+    padding: 0.6rem 0.2rem;
+    font-size: 0.8rem;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all var(--transition);
+    border: 1px solid transparent;
+}
+
+/* Calendar status styles */
+.cell_available {
+    background-color: var(--surface_2);
+    border: 1px solid var(--border);
+    color: var(--text_primary);
+    cursor: pointer;
+}
+
+.cell_available:hover {
+    border-color: var(--teal_bright);
+    background: var(--surface_3);
+}
+
+.cell_soldout {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    opacity: 0.6;
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+.cell_empty {
+    background-color: transparent;
+    border: none;
+}
+
+.cell_rate {
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-top: 0.2rem;
+    color: var(--teal_bright);
+}
+
+.cell_date_num {
+    font-weight: 500;
+    align-self: flex-start;
+    padding-left: 0.3rem;
+    font-size: 0.75rem;
+}
+
+/* Date range selection highlights */
+.cell_selected_checkin {
+    background-color: var(--purple_mid) !important;
+    color: var(--white) !important;
+    border-radius: 8px 0 0 8px !important;
+    border-color: var(--teal_bright) !important;
+}
+
+.cell_selected_checkout {
+    background-color: var(--teal) !important;
+    color: var(--white) !important;
+    border-radius: 0 8px 8px 0 !important;
+    border-color: var(--teal_bright) !important;
+}
+
+.cell_selected_inbetween {
+    background-color: rgba(101, 220, 213, 0.15) !important;
+    color: var(--teal_bright) !important;
+    border-radius: 0 !important;
+}
+
+.calendar_legend {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: var(--text_secondary);
+    flex-wrap: wrap;
+}
+
+.legend_item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.legend_color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+}
+
+/* Booking Summary Card */
+.booking_sidebar_card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 1.8rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+
+.sidebar_summary_row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    margin-bottom: 0.8rem;
+    color: var(--text_secondary);
+}
+
+.sidebar_total {
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+    margin-top: 1rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    color: var(--white);
+}
+
+/* Reviews Styling section */
+.review_card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+
+.review_author {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--white);
+}
+
+.review_comment {
+    font-size: 0.95rem;
+    color: var(--text_secondary);
+}
+
+/* Booking Sidebar Container Stickiness */
+.booking_sidebar_wrapper {
+    position: sticky;
+    top: 90px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+    .booking_sidebar_wrapper {
+        position: static;
+    }
+}

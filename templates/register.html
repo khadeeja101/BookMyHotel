@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - BookMyHotel.com{% endblock %}
+
+{% block content %}
+<div class="auth_panel" style="max-width: 540px;">
+    <h2>Create Your Account</h2>
+    <p>Sign up to compare dynamically priced rooms, select add-on services, and receive eco-friendly tax break rewards.</p>
+    
+    <form action="{{ url_for('auth.register') }}" method="POST">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; text-align: left;">
+            <div class="form_group">
+                <label for="firstName" class="form_label">First Name</label>
+                <input type="text" name="first_name" id="firstName" class="form_control" placeholder="John" required>
+            </div>
+            
+            <div class="form_group">
+                <label for="lastName" class="form_label">Last Name</label>
+                <input type="text" name="last_name" id="lastName" class="form_control" placeholder="Doe" required>
+            </div>
+        </div>
+        
+        <div class="form_group" style="text-align: left;">
+            <label for="email" class="form_label">Email Address</label>
+            <input type="email" name="email" id="email" class="form_control" placeholder="you@example.com" required>
+        </div>
+        
+        <div class="form_group" style="text-align: left;">
+            <label for="password" class="form_label">Password</label>
+            <input type="password" name="password" id="password" class="form_control" placeholder="Minimum 6 characters" required>
+        </div>
+        
+        <button type="submit" class="btn btn_primary btn_full" style="margin-top: 1.5rem;">
+            Create Account
+        </button>
+    </form>
+    
+    <div class="auth_footer">
+        Already have an account? <a href="{{ url_for('auth.login') }}">Log in here</a>
+    </div>
+</div>
+{% endblock %}

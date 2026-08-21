@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify Email - BookMyHotel.com{% endblock %}
+
+{% block content %}
+<div class="auth_panel">
+    <h2>Verify Your Email</h2>
+    <p>A 6-digit verification code has been generated for your registration.</p>
+
+
+    <form action="{{ url_for('auth.verify') }}" method="POST">
+        <!-- Maintain target email context in form -->
+        <input type="hidden" name="email" value="{{ email }}">
+
+        <div class="form_group" style="text-align: left;">
+            <label for="emailDisplay" class="form_label">Registered Email</label>
+            <input type="text" id="emailDisplay" class="form_control" disabled value="{{ email }}"
+                style="background-color: var(--purple_dark); opacity: 0.8;">
+        </div>
+
+        <div class="form_group" style="text-align: left;">
+            <label for="code" class="form_label">Enter 6-Digit Code</label>
+            <input type="text" name="code" id="code" class="form_control" placeholder="e.g. 123456" maxlength="6"
+                pattern="\d{6}"
+                style="text-align:center; font-size:1.5rem; letter-spacing:8px; font-weight:700; background-color: var(--surface_3);"
+                required autofocus>
+        </div>
+
+        <button type="submit" class="btn btn_primary btn_full" style="margin-top: 1.5rem;">
+            Verify Account
+        </button>
+    </form>
+
+    <div class="auth_footer">
+        Having issues? <a href="{{ url_for('auth.register') }}">Try registering again</a>
+    </div>
+</div>
+{% endblock %}

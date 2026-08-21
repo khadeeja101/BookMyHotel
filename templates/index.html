@@ -1,0 +1,338 @@
+{% extends 'base.html' %}
+
+{% block title %}BookMyHotel.com - Find Your Perfect Stay{% endblock %}
+
+{% block content %}
+<!-- Section 1: Search Banner -->
+<section class="hero_section"
+    style="background-image: linear-gradient(rgba(26, 14, 46, 0.7), rgba(26, 14, 46, 0.85)), url('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1920&q=80');">
+    <div class="hero_content">
+        <span class="label_capsule">Asia & Europe's Finest Hotels</span>
+        <h1>Find Your <span class="highlight_teal">Perfect</span> Stay, Anywhere</h1>
+        <p class="hero_subtitle">Curated luxury hotels across 40+ cities. Seamless booking, exclusive rates, and
+            unforgettable experiences.</p>
+
+        <!-- Horizontal Search Widget -->
+        <div class="horizontal_search_widget">
+            <form action="{{ url_for('main.browse_hotels') }}" method="GET" class="horizontal_search_form">
+
+                <!-- Destination Selection -->
+                <div class="horizontal_search_field">
+                    <label for="searchDestination">Destination</label>
+                    <select name="location" id="searchDestination" class="horizontal_search_input">
+                        <option value="">City or hotel...</option>
+                        {% for loc in locations %}
+                        <option value="{{ loc }}">{{ loc }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Check-In Selection -->
+                <div class="horizontal_search_field">
+                    <label for="checkInDate">Check-In</label>
+                    <input type="date" name="check_in" id="checkInDate" class="horizontal_search_input"
+                        value="2026-07-31">
+                </div>
+
+                <!-- Check-Out Selection -->
+                <div class="horizontal_search_field">
+                    <label for="checkOutDate">Check-Out</label>
+                    <input type="date" name="check_out" id="checkOutDate" class="horizontal_search_input"
+                        value="2026-08-03">
+                </div>
+
+                <!-- Guests Count Selector -->
+                <div class="horizontal_search_field">
+                    <label for="guestsCount">Guests</label>
+                    <select name="guests" id="guestsCount" class="horizontal_search_input">
+                        <option value="1">1 Guest</option>
+                        <option value="2" selected>2 Guests</option>
+                        <option value="3">3 Guests</option>
+                        <option value="4">4 Guests</option>
+                    </select>
+                </div>
+
+                <!-- Submit Action Button -->
+                <button type="submit" class="horizontal_search_btn">
+                    Search
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Section 2: Translucent Destination Caps & Stats Bar -->
+<section class="stats_bar_section"
+    style="background-image: linear-gradient(rgba(36, 22, 64, 0.9), rgba(36, 22, 64, 0.95)), url('https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1920&q=80');">
+    <div class="stats_container">
+        <!-- Stats details row -->
+        <div class="global_stats_row">
+            <div class="stat_item">
+                <h3>120+</h3>
+                <p>Hotels</p>
+            </div>
+            <div class="stat_item_divider"></div>
+            <div class="stat_item">
+                <h3>40+</h3>
+                <p>Cities</p>
+            </div>
+            <div class="stat_item_divider"></div>
+            <div class="stat_item">
+                <h3>98K+</h3>
+                <p>Bookings</p>
+            </div>
+            <div class="stat_item_divider"></div>
+            <div class="stat_item">
+                <h3>4.8★</h3>
+                <p>Avg Rating</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section 3: Curated Selection - Featured Hotels Grid -->
+<section class="home_section_padding">
+    <div class="section_header_center">
+        <span class="label_capsule">Curated Selection</span>
+        <h2>Featured Hotels</h2>
+        <p class="section_subtitle">Hand-picked luxury properties across Asia and Europe — each offering something
+            extraordinary.</p>
+    </div>
+
+    <div class="featured_hotels_grid">
+        {% for hotel in hotels[:3] %}
+        <div class="hotel_feature_card">
+            <!-- Cover Image Section -->
+            <div class="hotel_feature_img_wrap">
+                {% if 'Dubai' in hotel.location %}
+                <img src="https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=800&q=80"
+                    alt="{{ hotel.name }}">
+                {% elif 'Paris' in hotel.location %}
+                <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80"
+                    alt="{{ hotel.name }}">
+                {% elif 'Tokyo' in hotel.location %}
+                <img src="https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80"
+                    alt="{{ hotel.name }}">
+                {% else %}
+                <img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80"
+                    alt="{{ hotel.name }}">
+                {% endif %}
+
+                <!-- Overlays -->
+                <span class="badge_feature_overlay left_badge">
+                    {% if loop.index == 1 %}Highly Rated{% elif loop.index == 2 %}Editor's Choice{% else %}Best Value{%
+                    endif %}
+                </span>
+                <span class="badge_feature_overlay right_badge">
+                    {% if loop.index == 1 %}-15%{% elif loop.index == 2 %}-20%{% else %}-10%{% endif %}
+                </span>
+            </div>
+
+            <div class="hotel_feature_body">
+                <div class="hotel_feature_meta">
+                    <span class="hotel_feature_loc">📍 {{ hotel.location }}</span>
+                    <div class="hotel_feature_stars">
+                        {% for i in range(hotel.rating) %}★{% endfor %}
+                        <span class="rating_num">{{ hotel.temp_avg_rating }} ({{ hotel.temp_review_count }})</span>
+                    </div>
+                </div>
+
+                <h3 class="hotel_feature_title">{{ hotel.name }}</h3>
+
+                <!-- Amenities capsules list -->
+                <div class="hotel_feature_amenities">
+                    <span class="feature_tag">Free WiFi</span>
+                    {% if 'Dubai' in hotel.location %}
+                    <span class="feature_tag">Infinity Pool</span>
+                    <span class="feature_tag">Spa</span>
+                    {% elif 'Paris' in hotel.location %}
+                    <span class="feature_tag">Fine Dining</span>
+                    <span class="feature_tag">Bar</span>
+                    {% elif 'Tokyo' in hotel.location %}
+                    <span class="feature_tag">Onsen</span>
+                    <span class="feature_tag">Kaiseki</span>
+                    {% else %}
+                    <span class="feature_tag">Fitness Center</span>
+                    <span class="feature_tag">Lounge</span>
+                    {% endif %}
+                </div>
+
+                <!-- Footer Rate & Booking Row -->
+                <div class="hotel_feature_footer">
+                    <div class="hotel_feature_price">
+                        <span class="price_amount">${{ hotel.temp_min_price }}</span>
+                        <span class="price_unit">/ night</span>
+                    </div>
+                    <a href="{{ url_for('main.hotel_details', hotel_id=hotel.id) }}" class="btn btn_primary btn_sm">
+                        View Rooms
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="center_cta_row">
+        <a href="{{ url_for('main.browse_hotels') }}" class="btn btn_outline">View All Hotels</a>
+    </div>
+</section>
+
+<!-- Section 4: Why Choose Us -->
+<section class="why_choose_section" style="background-color: var(--surface_2);">
+    <div class="section_header_center">
+        <span class="label_capsule">Why Choose Us</span>
+    </div>
+
+    <div class="why_choose_grid">
+        <div class="why_card">
+            <h3>Secure Booking</h3>
+            <p>Bank-level SSL encryption on all transactions. Your payment and personal data are always protected.</p>
+        </div>
+        <div class="why_card">
+            <h3>Best Rate Guarantee</h3>
+            <p>We match any lower price you find. Exclusive member rates and seasonal promotions unavailable elsewhere.
+            </p>
+        </div>
+        <div class="why_card">
+            <h3>Instant Confirmation</h3>
+            <p>Real-time availability across all properties. Receive your booking confirmation within seconds.</p>
+        </div>
+        <div class="why_card">
+            <h3>Eco Stays</h3>
+            <p>Filter for certified sustainable hotels. Travel responsibly with our green-rated property programme.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Section 5: Exclusive Promotions -->
+<section class="home_section_padding" id="promotionsSection">
+    <div class="section_header_center">
+        <span class="label_capsule">Limited Offers</span>
+        <h2>Exclusive Promotions</h2>
+        <p class="section_subtitle">Time-sensitive deals across our most sought-after properties.</p>
+    </div>
+
+    <div class="promotions_grid">
+        {% for promo in promotions %}
+        <div class="promo_deal_card">
+            <!-- Percentage Badge Left -->
+            <div class="promo_pct_badge">
+                <span>
+                    {% if '20' in promo.description or '20' in promo.code %}20%{% else %}15%{% endif %}
+                    <br>OFF
+                </span>
+            </div>
+            <!-- Content Right -->
+            <div class="promo_deal_body">
+                <h3>{{ promo.name }}</h3>
+                <p class="promo_deal_hotel">{{ promo.hotel.name }}</p>
+                <p class="promo_deal_desc">{{ promo.description }}</p>
+
+                <div class="promo_deal_footer">
+                    <span class="promo_coupon_code">{{ promo.code }}</span>
+                    <a href="{{ url_for('main.hotel_details', hotel_id=promo.hotel_id) }}"
+                        class="btn btn_outline btn_sm">Book Now</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <!-- Mock Fallback Promotion Cards if Database yields empty promotions -->
+        <div class="promo_deal_card">
+            <div class="promo_pct_badge"><span>15%<br>OFF</span></div>
+            <div class="promo_deal_body">
+                <h3>Early Bird Summer Deal</h3>
+                <p class="promo_deal_hotel">The Indochine Palace</p>
+                <p class="promo_deal_desc">Book 30 days in advance and save 15% on all room types during summer.</p>
+                <div class="promo_deal_footer">
+                    <span class="promo_coupon_code">SUMMER15</span>
+                    <a href="{{ url_for('main.browse_hotels') }}" class="btn btn_outline btn_sm">Book Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="promo_deal_card">
+            <div class="promo_pct_badge"><span>20%<br>OFF</span></div>
+            <div class="promo_deal_body">
+                <h3>Tokyo Welcome Deal</h3>
+                <p class="promo_deal_hotel">The Hyatt Regency Tokyo</p>
+                <p class="promo_deal_desc">Tokyo Welcome Deal: save 20% on suites for a limited time.</p>
+                <div class="promo_deal_footer">
+                    <span class="promo_coupon_code">TOKYO20</span>
+                    <a href="{{ url_for('main.browse_hotels') }}" class="btn btn_outline btn_sm">Book Now</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Section 6: What Our Guests Say -->
+<section class="why_choose_section" style="background-color: var(--surface_2);">
+    <div class="section_header_center">
+        <span class="label_capsule">Guest Reviews</span>
+        <h2>What Our Guests Say</h2>
+    </div>
+
+    <div class="guest_reviews_grid">
+        <!-- Review Card 1 -->
+        <div class="review_testimonial_card">
+            <div class="testimonial_user_row">
+                <div class="user_avatar_placeholder">SM</div>
+                <div>
+                    <h4>Sarah Mitchell</h4>
+                    <span>United Kingdom</span>
+                </div>
+                <span class="testimonial_stars">5.0 ★</span>
+            </div>
+            <p class="testimonial_hotel_name">The Marriott Dubai Marina</p>
+            <h5 class="testimonial_title">"Truly magical experience"</h5>
+            <p class="testimonial_body">The river views were breathtaking and the staff went above and beyond. The spa
+                is world-class. We will absolutely return.</p>
+        </div>
+
+        <!-- Review Card 2 -->
+        <div class="review_testimonial_card">
+            <div class="testimonial_user_row">
+                <div class="user_avatar_placeholder">JT</div>
+                <div>
+                    <h4>James Tanner</h4>
+                    <span>Australia</span>
+                </div>
+                <span class="testimonial_stars">4.0 ★</span>
+            </div>
+            <p class="testimonial_hotel_name">The Hilton Paris Opera</p>
+            <h5 class="testimonial_title">"Excellent — minor quirks"</h5>
+            <p class="testimonial_body">Stunning hotel with outstanding service. The pool area got a bit crowded at peak
+                hours but breakfast is phenomenal.</p>
+        </div>
+
+        <!-- Review Card 3 -->
+        <div class="review_testimonial_card">
+            <div class="testimonial_user_row">
+                <div class="user_avatar_placeholder">CW</div>
+                <div>
+                    <h4>Chen Wei</h4>
+                    <span>China</span>
+                </div>
+                <span class="testimonial_stars">5.0 ★</span>
+            </div>
+            <p class="testimonial_hotel_name">The Hyatt Regency Tokyo</p>
+            <h5 class="testimonial_title">"The infinity pool is a dream"</h5>
+            <p class="testimonial_body">Nothing beats watching the sunset over the skyline from that pool. Service was
+                impeccable throughout.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Section 7: Ready to Start Your Journey CTA -->
+<section class="journey_cta_section">
+    <div class="journey_container"
+        style="background-image: linear-gradient(135deg, rgba(78,31,110,0.85) 0%, rgba(36,22,64,0.95) 100%), url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1920&q=80');">
+        <h2>Ready to Start Your Journey?</h2>
+        <p>Join over 98,000 travellers who trust BookMyHotel for their stays in Asia & Europe.</p>
+        <div class="journey_btn_row">
+            <a href="{{ url_for('auth.register') }}" class="btn btn_primary">Create Free Account</a>
+            <a href="{{ url_for('main.browse_hotels') }}" class="btn btn_outline">Browse Hotels</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

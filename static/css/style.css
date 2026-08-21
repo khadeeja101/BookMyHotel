@@ -1,0 +1,10 @@
+/* 
+   BookMyHotel - Main Stylesheet
+ */
+
+@import url('base.css');
+@import url('auth.css');
+@import url('dashboard.css');
+@import url('hotel.css');
+@import url('payment.css');
+@import url('admin.css');

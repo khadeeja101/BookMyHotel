@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - BookMyHotel.com{% endblock %}
+
+{% block content %}
+<div class="auth_panel">
+    <h2>Welcome Back</h2>
+    <p id="loginSubtitle">Please log in to your BookMyHotel account to manage stays and make reservations.</p>
+    
+    <!-- Login Role Switcher Toggle -->
+    <div class="role_toggle_container" style="display: flex; background: var(--surface_3); border: 1px solid var(--border); border-radius: 8px; padding: 4px; margin-bottom: 1.5rem;">
+        <button type="button" id="toggleCustomer" class="btn btn_sm" style="flex: 1; border-radius: 6px; font-weight: 600; transition: all 0.2s; background: var(--teal_bright); color: var(--purple_deep); border: none; cursor: pointer;">
+            Customer
+        </button>
+        <button type="button" id="toggleAdmin" class="btn btn_sm" style="flex: 1; border-radius: 6px; font-weight: 500; transition: all 0.2s; background: transparent; color: var(--text_secondary); border: none; cursor: pointer;">
+            Admin
+        </button>
+    </div>
+
+    <form action="{{ url_for('auth.login') }}" method="POST">
+        <input type="hidden" name="login_role" id="loginRole" value="customer">
+
+        <div class="form_group" style="text-align: left;">
+            <label for="email" class="form_label">Email Address</label>
+            <input type="email" name="email" id="email" class="form_control" placeholder="you@example.com" required>
+        </div>
+        
+        <div class="form_group" style="text-align: left;">
+            <label for="password" class="form_label">Password</label>
+            <input type="password" name="password" id="password" class="form_control" placeholder="••••••••" required>
+        </div>
+        
+        <button type="submit" class="btn btn_primary btn_full" style="margin-top: 1.5rem;">
+            Login
+        </button>
+    </form>
+    
+    <div class="auth_footer">
+        Don't have an account? <a href="{{ url_for('auth.register') }}">Register here</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const toggleCustomer = document.getElementById('toggleCustomer');
+    const toggleAdmin = document.getElementById('toggleAdmin');
+    const loginRole = document.getElementById('loginRole');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const loginSubtitle = document.getElementById('loginSubtitle');
+
+    toggleCustomer.addEventListener('click', () => {
+        // Update toggle styles
+        toggleCustomer.style.background = 'var(--teal_bright)';
+        toggleCustomer.style.color = 'var(--purple_deep)';
+        toggleCustomer.style.fontWeight = '600';
+
+        toggleAdmin.style.background = 'transparent';
+        toggleAdmin.style.color = 'var(--text_secondary)';
+        toggleAdmin.style.fontWeight = '500';
+
+        // Update hidden field value
+        loginRole.value = 'customer';
+
+        // Clear values or restore
+        emailInput.value = '';
+        passwordInput.value = '';
+        loginSubtitle.textContent = 'Please log in to your BookMyHotel account to manage stays and make reservations.';
+    });
+
+    toggleAdmin.addEventListener('click', () => {
+        // Update toggle styles
+        toggleAdmin.style.background = 'var(--teal_bright)';
+        toggleAdmin.style.color = 'var(--purple_deep)';
+        toggleAdmin.style.fontWeight = '600';
+
+        toggleCustomer.style.background = 'transparent';
+        toggleCustomer.style.color = 'var(--text_secondary)';
+        toggleCustomer.style.fontWeight = '500';
+
+        // Update hidden field value
+        loginRole.value = 'admin';
+
+        // Prefill default admin credentials for convenience
+        emailInput.value = 'admin@bookmyhotel.com';
+        passwordInput.value = 'adminpassword';
+        loginSubtitle.textContent = 'Log in with system administrator credentials to access the management dashboard.';
+    });
+</script>
+{% endblock %}

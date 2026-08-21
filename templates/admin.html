@@ -1,0 +1,624 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - BookMyHotel.com{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2.5rem;">
+    <h1>Administrator Console</h1>
+    <p style="color:var(--text_secondary);">Manage hotel contracts, room configurations, promotion discount vouchers,
+        and analyze company revenue performance.</p>
+</div>
+
+<!-- Global Performance Metrics -->
+<section class="metrics_row">
+    <div class="metric_card">
+        <h3>Booked Room Nights</h3>
+        <div class="metric_value">{{ total_nights }}</div>
+        <p style="font-size:0.8rem; color:var(--text_muted); margin-top:0.3rem;">Cumulative nights reserved</p>
+    </div>
+
+    <div class="metric_card">
+        <h3>Room Revenue</h3>
+        <div class="metric_value">${{ "%.2f"|format(total_revenue) }}</div>
+        <p style="font-size:0.8rem; color:var(--text_muted); margin-top:0.3rem;">Total income from rooms & services</p>
+    </div>
+
+    <div class="metric_card">
+        <h3>Average Daily Rate (ADR)</h3>
+        <div class="metric_value">${{ "%.2f"|format(adr) }}</div>
+        <p style="font-size:0.8rem; color:var(--text_muted); margin-top:0.3rem;">Revenue / Booked nights</p>
+    </div>
+</section>
+
+<!-- Administrative Tab Navigation Buttons -->
+<div class="admin_tabs">
+    <button class="admin_tab_btn {% if active_tab == 'reports' %}active{% endif %}" data-tab="reports">Hotel
+        Reports</button>
+    <button class="admin_tab_btn {% if active_tab == 'date-log' or active_tab == 'dateLog' %}active{% endif %}"
+        data-tab="dateLog">Date Reservation Log</button>
+    <button class="admin_tab_btn {% if active_tab == 'hotels' %}active{% endif %}" data-tab="hotels">Manage
+        Hotels</button>
+    <button class="admin_tab_btn {% if active_tab == 'rooms' %}active{% endif %}" data-tab="rooms">Manage Rooms</button>
+    <button class="admin_tab_btn {% if active_tab == 'promotions' %}active{% endif %}" data-tab="promotions">Create
+        Promotions</button>
+</div>
+
+<!-- Tab Panel A: Hotel Reports Table -->
+<div class="admin_panel {% if active_tab == 'reports' %}active{% endif %}" id="panelReports">
+    <h2>Hotel Performance Reports</h2>
+    <p style="color:var(--text_secondary); margin-bottom:1.5rem;">A granular breakdown of statistics for each contract
+        hotel chain.</p>
+
+    <div class="table_container">
+        <table class="custom_table">
+            <thead>
+                <tr>
+                    <th>Hotel Name</th>
+                    <th>Location</th>
+                    <th>Bookings Count</th>
+                    <th>Room Nights</th>
+                    <th>Total Revenue</th>
+                    <th>Average Daily Rate (ADR)</th>
+                    <th>Avg Star Review</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rep in hotel_reports %}
+                <tr>
+                    <td><strong style="color:var(--white);">{{ rep.name }}</strong></td>
+                    <td>{{ rep.location }}</td>
+                    <td>{{ rep.reservations_count }}</td>
+                    <td>{{ rep.nights }} nights</td>
+                    <td><strong style="color:var(--teal_bright);">${{ "%.2f"|format(rep.revenue) }}</strong></td>
+                    <td>${{ "%.2f"|format(rep.adr) }}</td>
+                    <td>{{ rep.avg_rating }} / 5.0</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Dynamic CSS Performance Trends Charts -->
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-top: 3.5rem;">
+        <!-- Chart 1: Booked Room Nights by Hotel -->
+        <div
+            style="background: var(--surface); padding: 2rem; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow);">
+            <h3
+                style="color:var(--white); margin-bottom:1.5rem; font-size:1.15rem; font-family:'Playfair Display', serif;">
+                📈 Booked Room Nights by Hotel</h3>
+            <div style="display:flex; flex-direction:column; gap:1.25rem;">
+                {% for rep in hotel_reports %}
+                {% set max_nights = hotel_reports|map(attribute='nights')|max %}
+                {% set percent = (rep.nights / max_nights * 100)|round|int if max_nights > 0 else 0 %}
+                <div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:0.4rem;">
+                        <span style="color:var(--text_primary);">{{ rep.name }}</span>
+                        <strong style="color:var(--teal_bright);">{{ rep.nights }} nights</strong>
+                    </div>
+                    <div
+                        style="width:100%; height:8px; background:var(--surface_2); border-radius:4px; overflow:hidden;">
+                        <div
+                            style="width:{{ percent }}%; height:100%; background:linear-gradient(90deg, var(--teal), var(--teal_bright)); border-radius:4px; box-shadow:0 0 10px rgba(101,220,213,0.3);">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Chart 2: Revenue Generated by Hotel -->
+        <div
+            style="background: var(--surface); padding: 2rem; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow);">
+            <h3
+                style="color:var(--white); margin-bottom:1.5rem; font-size:1.15rem; font-family:'Playfair Display', serif;">
+                💰 Revenue Generated by Hotel</h3>
+            <div style="display:flex; flex-direction:column; gap:1.25rem;">
+                {% for rep in hotel_reports %}
+                {% set max_rev = hotel_reports|map(attribute='revenue')|max %}
+                {% set percent = (rep.revenue / max_rev * 100)|round|int if max_rev > 0 else 0 %}
+                <div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:0.4rem;">
+                        <span style="color:var(--text_primary);">{{ rep.name }}</span>
+                        <strong style="color:var(--mint);">${{ "%.2f"|format(rep.revenue) }}</strong>
+                    </div>
+                    <div
+                        style="width:100%; height:8px; background:var(--surface_2); border-radius:4px; overflow:hidden;">
+                        <div
+                            style="width:{{ percent }}%; height:100%; background:linear-gradient(90deg, var(--purple_mid), var(--mint)); border-radius:4px; box-shadow:0 0 10px rgba(152,232,222,0.3);">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tab Panel B: Date Reservation Log -->
+<div class="admin_panel {% if active_tab == 'date-log' or active_tab == 'dateLog' %}active{% endif %}"
+    id="panelDateLog">
+    <h2>Date Reservation Log</h2>
+    <p style="color:var(--text_secondary); margin-bottom:1.5rem;">View a complete listing of active bookings occupying
+        rooms on a particular day or manage all system reservations.</p>
+
+    <!-- Filter and Edit Reservation Forms Grid -->
+    <div style="display:flex; gap:2rem; flex-wrap:wrap; margin-bottom:2rem; align-items:start;">
+        <!-- Date picker filter form -->
+        <div
+            style="background-color:var(--surface); padding:1.2rem; border-radius:var(--radius); border:1px solid var(--border); flex:1; min-width:300px;">
+            <form action="{{ url_for('admin.dashboard') }}" method="GET"
+                style="display:flex; gap:0.5rem; align-items:flex-end;">
+                <!-- Keep tab active during page reload -->
+                <input type="hidden" name="tab" value="dateLog">
+                <div class="form_group" style="margin-bottom:0; flex-grow:1;">
+                    <label for="dateFilter" class="form_label">Select Target Date</label>
+                    <input type="date" name="date_filter" id="dateFilter" class="form_control"
+                        value="{{ selected_date }}">
+                </div>
+                <button type="submit" class="btn btn_primary" style="padding: 0.8rem 1.2rem;">Filter</button>
+                {% if selected_date %}
+                <a href="{{ url_for('admin.dashboard', tab='dateLog') }}" class="btn btn_outline"
+                    style="padding: 0.8rem 1.2rem; display: inline-flex; align-items: center; justify-content: center; height: 38px;">Clear</a>
+                {% endif %}
+            </form>
+        </div>
+
+        <!-- Edit Reservation Card (Hidden initially, shown when Edit is clicked) -->
+        <div id="editReservationCard"
+            style="background-color:var(--surface); padding:1.2rem; border-radius:var(--radius); border:1px solid var(--border); flex:1.5; min-width:350px; display:none;">
+            <h3 style="color:var(--white); font-size:1.1rem; margin-bottom:0.8rem;" id="editResTitle">Edit Reservation
+                Details</h3>
+            <form action="" method="POST" id="editResForm"
+                style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem;">
+                <div class="form_group" style="margin-bottom:0;">
+                    <label for="editResCheckIn" class="form_label" style="font-size:0.75rem;">Check In</label>
+                    <input type="date" name="check_in" id="editResCheckIn" class="form_control" required>
+                </div>
+                <div class="form_group" style="margin-bottom:0;">
+                    <label for="editResCheckOut" class="form_label" style="font-size:0.75rem;">Check Out</label>
+                    <input type="date" name="check_out" id="editResCheckOut" class="form_control" required>
+                </div>
+                <div class="form_group" style="margin-bottom:0;">
+                    <label for="editResAmount" class="form_label" style="font-size:0.75rem;">Total Paid ($)</label>
+                    <input type="number" name="total_amount" id="editResAmount" class="form_control" step="0.01"
+                        required>
+                </div>
+                <div class="form_group" style="margin-bottom:0;">
+                    <label for="editResStatus" class="form_label" style="font-size:0.75rem;">Status</label>
+                    <select name="status" id="editResStatus" class="form_control">
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div style="grid-column: span 2; display:flex; gap:0.5rem; margin-top:0.75rem;">
+                    <button type="submit" class="btn btn_primary btn_sm" style="flex:2;">Save Reservation</button>
+                    <button type="button" onclick="document.getElementById('editReservationCard').style.display='none';"
+                        class="btn btn_ghost btn_sm" style="flex:1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if selected_date %}
+    <h3 style="color:var(--white); font-family:'Playfair Display',serif; font-size:1.2rem;">Active Stays on {{
+        selected_date }}</h3>
+    {% else %}
+    <h3 style="color:var(--white); font-family:'Playfair Display',serif; font-size:1.2rem;">All System Reservations</h3>
+    {% endif %}
+
+    {% if date_reservations|length == 0 %}
+    <p style="color:var(--text_secondary); margin-top:1rem;">No reservations found.</p>
+    {% else %}
+    <div class="table_container">
+        <table class="custom_table">
+            <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Guest Name</th>
+                    <th>Hotel</th>
+                    <th>Room Category</th>
+                    <th>Stay Interval</th>
+                    <th>Total Paid</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for res in date_reservations %}
+                <tr>
+                    <td>#{{ res.id }}</td>
+                    <td><strong style="color:var(--white);">{{ res.user.first_name }} {{ res.user.last_name
+                            }}</strong><br><small style="color:var(--text_secondary);">{{ res.user.email }}</small></td>
+                    <td>{{ res.room.hotel.name }}</td>
+                    <td>{{ res.room.room_type }}</td>
+                    <td>{{ res.check_in.strftime('%Y-%m-%d') }} to {{ res.check_out.strftime('%Y-%m-%d') }}</td>
+                    <td><strong style="color:var(--teal_bright);">${{ "%.2f"|format(res.total_amount) }}</strong></td>
+                    <td>
+                        {% if res.status == 'Confirmed' %}
+                        <span class="role_badge"
+                            style="background:rgba(34,197,94,0.15); color:#22c55e; border-color:rgba(34,197,94,0.25);">Confirmed</span>
+                        {% else %}
+                        <span class="role_badge"
+                            style="background:rgba(239,68,68,0.15); color:#ef4444; border-color:rgba(239,68,68,0.25);">Cancelled</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:0.5rem; align-items:center;">
+                            <!-- Edit Button (loads JS triggers) -->
+                            <button type="button" class="btn btn_outline btn_sm edit_res_btn" data-id="{{ res.id }}"
+                                data-checkin="{{ res.check_in.strftime('%Y-%m-%d') }}"
+                                data-checkout="{{ res.check_out.strftime('%Y-%m-%d') }}"
+                                data-amount="{{ res.total_amount }}" data-status="{{ res.status }}">
+                                Edit
+                            </button>
+
+                            <!-- Delete Button -->
+                            <form action="{{ url_for('admin.delete_booking', reservation_id=res.id) }}" method="POST"
+                                onsubmit="return confirm('Are you sure you want to permanently delete Reservation #{{ res.id }} from the database?');"
+                                style="display:inline;">
+                                <button type="submit" class="btn btn_danger btn_sm">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Tab Panel C: Manage Hotels (Add / Edit / Remove) -->
+<div class="admin_panel" id="panelHotels">
+    <h2>Manage Hotel Contracts</h2>
+    <p style="color:var(--text_secondary); margin-bottom:2rem;">Add new hotel branches, edit descriptions/ratings, or
+        remove properties from the reservation platform index.</p>
+
+    <div class="admin_management_split">
+
+        <!-- Left: Form to Add/Edit Hotels -->
+        <div class="management_form_container">
+            <h3 id="hotelFormTitle" style="margin-bottom: 1.2rem; color:var(--white);">Add New Hotel Contract</h3>
+            <form action="{{ url_for('admin.add_hotel') }}" method="POST" id="addHotelForm">
+                <div class="form_group">
+                    <label for="hotelNameInput" class="form_label">Hotel Name</label>
+                    <input type="text" name="name" id="hotelNameInput" class="form_control"
+                        placeholder="e.g. Marriott Dubai Marina" required>
+                </div>
+
+                <div class="form_group">
+                    <label for="hotelLocationInput" class="form_label">Location</label>
+                    <input type="text" name="location" id="hotelLocationInput" class="form_control"
+                        placeholder="e.g. Dubai" required>
+                </div>
+
+                <div class="form_group">
+                    <label for="hotelDescInput" class="form_label">Description</label>
+                    <textarea name="description" id="hotelDescInput" class="form_control" rows="3"
+                        placeholder="Hotel summary..."></textarea>
+                </div>
+
+                <!-- Nested Services Selection Box -->
+                <div
+                    style="margin-top: 1.25rem; margin-bottom: 1.25rem; padding: 1.2rem; background: var(--surface_2); border: 1px solid var(--border); border-radius: var(--radius_sm);">
+                    <h4 style="color:var(--white); margin-bottom: 0.75rem; font-size: 0.9rem;">Add Hotel Service Add-on
+                    </h4>
+
+                    <div class="form_group" style="margin-bottom:0;">
+                        <label for="serviceNameSelect" class="form_label" style="font-size: 0.75rem;">Service
+                            Type</label>
+                        <select name="service_name" id="serviceNameSelect" class="form_control">
+                            <option value="">No service add-on selected...</option>
+                            <option value="Bar">Bar</option>
+                            <option value="Restaurant">Restaurant</option>
+                            <option value="Spa">Spa</option>
+                            <option value="Rent a Car">Rent a Car</option>
+                            <option value="Ticket for Local Trip">Ticket for Local Trip</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div class="form_group">
+                        <label for="hotelRatingInput" class="form_label">Star Rating</label>
+                        <select name="rating" id="hotelRatingInput" class="form_control">
+                            <option value="5">⭐⭐⭐⭐⭐</option>
+                            <option value="4">⭐⭐⭐⭐</option>
+                            <option value="3">⭐⭐⭐</option>
+                        </select>
+                    </div>
+                    <div class="form_group">
+                        <label for="hotelSustainabilityInput" class="form_label">Eco Level</label>
+                        <select name="sustainability_level" id="hotelSustainabilityInput" class="form_control">
+                            <option value="5">5 Leaves (High)</option>
+                            <option value="4">4 Leaves</option>
+                            <option value="3">3 Leaves (Standard)</option>
+                            <option value="2">2 Leaves</option>
+                            <option value="1">1 Leaf (Low)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div class="form_group">
+                        <label for="hotelCleanlinessInput" class="form_label">Cleanliness Score</label>
+                        <select name="cleanliness_level" id="hotelCleanlinessInput" class="form_control">
+                            <option value="5">Level 5 (Sanitized)</option>
+                            <option value="4">Level 4</option>
+                            <option value="3">Level 3</option>
+                        </select>
+                    </div>
+                    <div class="form_group">
+                        <label for="hotelWifiInput" class="form_label">Wi-Fi (Mbps)</label>
+                        <input type="number" name="wifi_speed" id="hotelWifiInput" class="form_control" value="100"
+                            min="10" max="1000">
+                    </div>
+                </div>
+
+                <input type="hidden" name="home_office" id="hotelHomeOfficeInput" value="1">
+
+                <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+                    <button type="submit" id="hotelFormSubmit" class="btn btn_primary" style="flex:2;">Add
+                        Hotel</button>
+                    <button type="button" id="resetHotelForm" class="btn btn_ghost" style="flex:1;">Clear</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right: Table of current hotels with edit/delete triggers -->
+        <div>
+            <h3 style="color:var(--white);">Active Hotels ({{ hotel_reports|length }})</h3>
+            <div class="table_container" style="margin-top:1rem;">
+                <table class="custom_table" style="font-size:0.85rem;">
+                    <thead>
+                        <tr>
+                            <th>Hotel</th>
+                            <th>Location</th>
+                            <th>Wi-Fi / Work</th>
+                            <th>Eco Level</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rep in hotel_reports %}
+                        <!-- Find hotel object details for JS data variables mapping -->
+                        {% set hotel_obj = hotels|selectattr('id', 'equalto', rep.id)|first %}
+                        <tr>
+                            <td>{{ rep.name }}</td>
+                            <td>{{ rep.location }}</td>
+                            <td>{{ hotel_obj.wifi_speed }} Mbps {% if hotel_obj.home_office %}(Work-Ready){% endif %}
+                            </td>
+                            <td>Level {{ hotel_obj.sustainability_level }}/5</td>
+                            <td>
+                                <!-- Edit loads details directly using Javascript dataset variables -->
+                                <button class="edit_hotel_btn" data-id="{{ hotel_obj.id }}"
+                                    data-name="{{ hotel_obj.name }}" data-location="{{ hotel_obj.location }}"
+                                    data-desc="{{ hotel_obj.description }}" data-rating="{{ hotel_obj.rating }}"
+                                    data-sustainability="{{ hotel_obj.sustainability_level }}"
+                                    data-cleanliness="{{ hotel_obj.cleanliness_level }}"
+                                    data-wifi="{{ hotel_obj.wifi_speed }}" data-homeoffice="{{ hotel_obj.home_office }}"
+                                    style="background:var(--surface_2); color:var(--teal_bright); border:1px solid var(--border); padding:0.3rem 0.6rem; border-radius:4px; font-weight:600; cursor:pointer;">
+                                    Edit
+                                </button>
+
+                                <form action="{{ url_for('admin.delete_hotel', hotel_id=hotel_obj.id) }}" method="POST"
+                                    onsubmit="return confirm('Are you sure you want to delete this hotel and all its rooms/bookings? This action is permanent!');"
+                                    style="display:inline;">
+                                    <button type="submit" class="btn btn_danger btn_sm" style="margin-left:5px;">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Tab Panel D: Manage Rooms (Add category) -->
+<div class="admin_panel" id="panelRooms">
+    <h2>Manage Room Configurations</h2>
+    <p style="color:var(--text_secondary); margin-bottom:2rem;">Add room type categories, configure base nightly prices,
+        set occupancies, and manage room allocations.</p>
+
+    <div
+        style="max-width: 600px; margin: 0 auto; background: var(--surface); padding: 2rem; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow);">
+        <form action="{{ url_for('admin.add_room') }}" method="POST">
+            <div class="form_group">
+                <label for="roomHotelSelect" class="form_label">Target Hotel Property</label>
+                <select name="hotel_id" id="roomHotelSelect" class="form_control" required>
+                    <option value="">Select Hotel Contract...</option>
+                    {% for hotel in hotels %}
+                    <option value="{{ hotel.id }}">{{ hotel.name }} ({{ hotel.location }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form_group">
+                <label for="roomTypeSelect" class="form_label">Room Category Class</label>
+                <select name="room_type" id="roomTypeSelect" class="form_control" required>
+                    <option value="Single Room">Single Room ( Nomad Space )</option>
+                    <option value="Double Room">Double Room ( Corporate Space )</option>
+                    <option value="Executive Suite">Executive Suite ( Premium Family Space )</option>
+                </select>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div class="form_group">
+                    <label for="roomBaseRate" class="form_label">Base Nightly Price ($)</label>
+                    <input type="number" name="base_rate" id="roomBaseRate" class="form_control"
+                        placeholder="e.g. 150.00" step="0.01" min="10" required>
+                </div>
+                <div class="form_group">
+                    <label for="roomOccupancy" class="form_label">Max Capacity (Guests)</label>
+                    <input type="number" name="max_occupancy" id="roomOccupancy" class="form_control" value="2" min="1"
+                        max="10" required>
+                </div>
+            </div>
+
+            <div class="form_group">
+                <label for="roomTotalCount" class="form_label">Total Rooms Allocated</label>
+                <input type="number" name="total_rooms" id="roomTotalCount" class="form_control" value="10" min="1"
+                    max="100" required>
+            </div>
+
+            <div class="form_group">
+                <label for="roomAmenities" class="form_label">Amenities (Comma separated list)</label>
+                <input type="text" name="amenities" id="roomAmenities" class="form_control"
+                    placeholder="Wi-Fi, Work Desk, Mini Bar, Shower">
+            </div>
+
+            <div class="form_group">
+                <label for="roomDesc" class="form_label">Room Description</label>
+                <textarea name="description" id="roomDesc" class="form_control" rows="3"
+                    placeholder="Describe the room characteristics..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn_primary btn_full" style="margin-top:1rem;">Configure Room Type</button>
+        </form>
+    </div>
+</div>
+
+<!-- Tab Panel E: Create Promotions (Coupon vouchers) -->
+<div class="admin_panel" id="panelPromotions">
+    <h2>Promotion & Discount Management</h2>
+    <p style="color:var(--text_secondary); margin-bottom:2rem;">Create and monitor custom coupon code vouchers for
+        properties.</p>
+
+    <div style="display:grid; grid-template-columns: 1fr 1.2fr; gap:2.5rem; align-items:start;">
+        <!-- Left: Form -->
+        <div
+            style="background: var(--surface); padding: 2rem; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow);">
+            <h3 id="promoFormTitle" style="color:var(--white); margin-bottom:1.5rem;">Create New Promotion</h3>
+            <form action="{{ url_for('admin.add_promotion') }}" method="POST" id="addPromoForm">
+                <div class="form_group">
+                    <label for="promoHotelSelect" class="form_label">Hotel Property Code Scope</label>
+                    <select name="hotel_id" id="promoHotelSelect" class="form_control" required>
+                        <option value="">Select Hotel...</option>
+                        {% for hotel in hotels %}
+                        <option value="{{ hotel.id }}">{{ hotel.name }} ({{ hotel.location }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div class="form_group">
+                        <label for="promoCode" class="form_label">Coupon Code (Uppercase)</label>
+                        <input type="text" name="code" id="promoCode" class="form_control" placeholder="e.g. SUMMER25"
+                            style="text-transform:uppercase;" required>
+                    </div>
+                    <div class="form_group">
+                        <label for="promoDiscount" class="form_label">Discount Percentage (%)</label>
+                        <input type="number" name="discount_percent" id="promoDiscount" class="form_control"
+                            placeholder="e.g. 20" min="5" max="90" required>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div class="form_group">
+                        <label for="promoStart" class="form_label">Start Date</label>
+                        <input type="date" name="start_date" id="promoStart" class="form_control" required>
+                    </div>
+                    <div class="form_group">
+                        <label for="promoEnd" class="form_label">End Date</label>
+                        <input type="date" name="end_date" id="promoEnd" class="form_control" required>
+                    </div>
+                </div>
+
+                <div class="form_group">
+                    <label for="promoDesc" class="form_label">Promo Description</label>
+                    <input type="text" name="description" id="promoDesc" class="form_control"
+                        placeholder="e.g. Summer special discount">
+                </div>
+
+                <div style="display:flex; gap:1rem; margin-top:1rem;">
+                    <button type="submit" id="promoFormSubmit" class="btn btn_primary" style="flex:2;">Create
+                        Voucher</button>
+                    <button type="button" id="resetPromoForm" class="btn btn_outline" style="flex:1;">Reset</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right: Active Promotions Table -->
+        <div>
+            <h3 style="color:var(--white);">Active Promotion Codes ({{ promotions|length }})</h3>
+            <div class="table_container" style="margin-top:1rem;">
+                <table class="custom_table" style="font-size:0.85rem;">
+                    <thead>
+                        <tr>
+                            <th>Scope / Hotel</th>
+                            <th>Code</th>
+                            <th>Discount</th>
+                            <th>Validity Period</th>
+                            <th>Description</th>
+                            <th style="text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for promo in promotions %}
+                        <tr>
+                            <td><strong style="color:var(--white);">{{ promo.hotel.name }}</strong></td>
+                            <td><span class="promo_coupon_code"
+                                    style="display:inline-block; font-size:0.75rem; padding: 0.2rem 0.5rem; background: rgba(101, 220, 213, 0.08); border: 1px dashed rgba(101, 220, 213, 0.3); border-radius: 4px; color: var(--teal-bright); font-family: monospace;">{{
+                                    promo.code }}</span></td>
+                            <td><strong style="color:var(--teal_bright);">{{ promo.discount_percent|round|int }}%
+                                    OFF</strong></td>
+                            <td>{{ promo.start_date.strftime('%Y-%m-%d') }} to {{ promo.end_date.strftime('%Y-%m-%d') }}
+                            </td>
+                            <td style="font-size:0.8rem; color:var(--text_secondary);">{{ promo.description }}</td>
+                            <td style="text-align: center; white-space: nowrap;">
+                                <button class="edit_promo_btn btn btn_outline btn_sm"
+                                    style="display:inline-block; margin-right:5px; padding: 4px 8px;"
+                                    data-id="{{ promo.id }}" data-hotel-id="{{ promo.hotel_id }}"
+                                    data-code="{{ promo.code }}" data-discount="{{ promo.discount_percent|round|int }}"
+                                    data-start="{{ promo.start_date.strftime('%Y-%m-%d') }}"
+                                    data-end="{{ promo.end_date.strftime('%Y-%m-%d') }}"
+                                    data-desc="{{ promo.description }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <form action="{{ url_for('admin.delete_promotion', promo_id=promo.id) }}" method="POST"
+                                    style="display:inline-block;"
+                                    onsubmit="return confirm('Are you sure you want to delete this promotion?');">
+                                    <button type="submit" class="btn btn_danger btn_sm" style="padding: 4px 8px;">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" style="text-align:center; color:var(--text_muted); padding: 2rem 0;">No
+                                active promotions found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+<script>
+    // Handles tab activation persistence when reloading via form submissions
+    document.addEventListener("DOMContentLoaded", () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const activeTab = urlParams.get('tab');
+
+        if (activeTab) {
+            const btn = document.querySelector(`.admin_tab_btn[data-tab="${activeTab}"]`);
+            if (btn) {
+                btn.click();
+            }
+        }
+    });
+</script>
+{% endblock %}
