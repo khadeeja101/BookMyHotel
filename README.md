@@ -33,5 +33,5 @@ Open your browser and navigate to: **`http://localhost:5000`**
 
 ---
 
-### Github link: https://github.com/Khadeeja101/BookMyHotel.git
+### Github link: https://github.com/khadeeja101/BookMyHotel.git
 
